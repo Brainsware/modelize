@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "sortable.js",
+  "sourceRoot": "../../../src/lib/",
+  "sources": [
+    "sortable.coffee"
+  ],
+  "names": [],
+  "mappings": "AAAA,IAAA,QAAA;;AAAA,QAAA,GAAW,SAAC,IAAD,GAAA;AACT,EAAA,IAAI,CAAC,IAAL,GAAY,CAAA,SAAA,KAAA,GAAA;WAAA,SAAC,EAAD,EAAK,QAAL,GAAA;aACV,IAAI,CAAC,MAAL,CAAY;AAAA,QAAE,IAAA,EAAM,EAAR;OAAZ,EAA0B,QAA1B,EADU;IAAA,EAAA;EAAA,CAAA,CAAA,CAAA,IAAA,CAAZ,CAAA;AAGA,SAAO,IAAP,CAJS;AAAA,CAAX,CAAA"
+}
