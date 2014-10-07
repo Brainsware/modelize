@@ -1,0 +1,18 @@
+{
+  "name": "modelize",
+  "title": "modelize",
+  "version": "0.1.0",
+  "description": "REST model interface for KnockoutJS",
+  "homepage": "http://brainsware.org",
+  "author": {
+    "name": "Daniel Khalil",
+    "email": "d.khalil@brainsware.org",
+    "url": "http://brainsware.org"
+  },
+  "devDependencies": {
+    "grunt": "~0.4",
+    "grunt-contrib-coffee": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-uglify": "^0.3.2"
+  }
+}
