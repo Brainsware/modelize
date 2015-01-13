@@ -1,6 +1,6 @@
 {
   "name": "modelize",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "REST model interface for KnockoutJS",
   "homepage": "http://brainsware.org",
   "author": "Daniel Khalil <d.khalil@brainsware.org>",
