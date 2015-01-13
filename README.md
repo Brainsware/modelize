@@ -3,12 +3,25 @@ Modelize
 
 Modelize is a small and simple model/data interface for REST APIs using KnockoutJS.
 
-This is a super early and very unstable release.
+This is a super early release. There's still some basic usability stuff missing, but that'll come soon.
 
-Usage
+Basic Usage
 ========
 
-Here an example model definition in coffeescript:
+Page setup first, include all required scripts:
+
+```
+<!-- jQuery -->
+<script src="/vendor/jquery/dist/jquery.min.js"></script>
+<!-- jQuery rest -->
+<script src="/vendor/jquery.rest/dist/1/jquery.rest.min.js"></script>
+<!-- Knockout -->
+<script src="/vendor/knockoutjs/dist/knockout.js"></script>
+<!-- Modelize -->
+<script src="/vendor/modelize/dist/modelize.min.js"></script>
+```
+
+Then define some models in coffeescript:
 
 ```
 # Post model with a simple 1:n relation for comments and two editable data fields
@@ -19,7 +32,7 @@ Post = Modelize
       model: 'Comment'
   editable: [
     'title',
-    'content']
+    'content' ]
 
 # The corresponding comment model
 Comment = Modelize
@@ -39,7 +52,12 @@ Model = Modelize
   api: 'stuff'
 ```
 
-Documentation
-============
+Using your models:
 
-TBD.
+```
+# Get all (published e.g.) posts and put them in the observable array @posts
+Post.get { status: 'published' }, @posts
+# You can also define custom methods for retrieval
+Post.get { id: 1 }, (post) =>
+  console.log post
+```
