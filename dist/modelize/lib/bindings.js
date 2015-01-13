@@ -67,7 +67,11 @@ ko.bindingHandlers.allowEdit = {
     if (!valueAccessor()) {
       element.disabled = true;
       element.readOnly = true;
-      return $(':input', element).attr('readOnly', 'readOnly');
+      return $(':input', element).attr('readOnly', true);
+    } else {
+      element.disabled = false;
+      element.readOnly = false;
+      return $(':input', element).attr('readOnly', false);
     }
   }
 };

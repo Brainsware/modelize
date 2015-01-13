@@ -82,6 +82,9 @@ LazyObservable = function(self, property, callback, params, init_value, make_arr
     self[property].push = function(e) {
       return _value.push(e);
     };
+    self[property].splice = function(e, i, args) {
+      return _value.splice(e, i, args);
+    };
   }
   self[property].loaded = ko.observable(false);
   return self[property].refresh = function() {

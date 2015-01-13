@@ -13,102 +13,57 @@ Modelize = (options) ->
 
     if options.sortable? && options.sortable == true
       Sortable self
+    if options.selectable? && options.selectable == true
+      Selectable self
     
     # Set relations
     # Lonely
+    if options.belongs_to?
+      unless options.has_one?
+        options.has_one = []
+      options.has_one = Ham.merge options.belongs_to, options.has_one
+
     if options.has_one?
       for name, data of options.has_one
         Ham.merge data,
           model: name.capitalize()
-        # Get related models
-        callback_fn = (id_param, api_name, name, model) ->
-          unless self[id_param]?
-            console.log 'Tried to access empty relation key: ' + id_param
-            return false
-          
-          unless callback?
-            callback = (data) =>
-              @[name] model(data)
-          api[api_name].read(self[id_param]).done callback
 
         fn = window[data.model]
         if self[name]?
           Observable self, name, new fn(self[name])
         else
-          LazyObservable self, name, callback_fn, self.relationship_fields(name, data.model), new fn
+          LazyObservable self, name, lazy_single_get_fn, self.relationship_fields(name, data.model)
 
     # Harem relations
     if options.has_many?
       for name, data of options.has_many
         Ham.merge data,
           model: name.capitalize()
-        # Get
-        callback_fn = (id_param, api_name, name, model) ->
-          unless callback?
-            callback = (data) =>
-              res = []
-              for m in data
-                res.push model(m)
-                #@[api_name].push model(m)
-              @[api_name] res
+        
+        relation_params = self.relationship_fields name, data.model
+        relation_params.push options
 
-          self.api()[api_name].read(self.id).done callback
-          #(params = {}, callback) =>
-          #  p = [self.id, params]
-          #  p.shift options.belongs_to if options.belongs_to?
-          #
-          #  unless callback?
-          #    callback = (data) =>
-          #      for m in data
-          #        @[api_name].push model(m)
-          #
-          #  self.api()[api_name].read.apply(self, p).done callback
-        LazyObservableArray self, name + 's', callback_fn, self.relationship_fields(name, data.model)
+        # Get
+        if self[name + 's']?
+          fn = window[data.model]
+          
+          items = []
+          for item in self[name + 's']
+            items.push new fn(item)
+
+          ObservableArray self, name + 's', items
+        else
+          LazyObservableArray self, name + 's', lazy_get_fn, relation_params
+        self[name + '_get'] = get_fn.apply self, relation_params
 
         # Create
-        callback_fn = (id_param, api_name, name, model) ->
-          #(id, callback) =>
-          (element, params = {}, callback) =>
-            unless callback?
-              callback = (data) =>
-                @[api_name].push model(data)
-            #params = {}
-            #params[id_param] = id
-
-            #console.log model
-
-            #model.create { invoice_id: self.id }, callback
-
-            if options.belongs_to?
-              self.api()[api_name].create(options.belongs_to, self.id, params).done callback
-            else
-              self.api()[api_name].create(self.id, params).done callback
-        self[name + '_add'] = callback_fn.apply self, self.relationship_fields(name, data.model)
+        self[name + '_add'] = create_fn.apply self, relation_params
 
         # Update
-        callback_fn = (id_param, api_name, name, model) ->
-          (id, params, callback) =>
-            if options.belongs_to?
-              self.api()[api_name].update(options.belongs_to, self.id, id, params).done callback
-            else
-              self.api()[api_name].update(self.id, id, params).done callback
-        self[name + '_update'] = callback_fn.apply self, self.relationship_fields(name, data.model)
+        self[name + '_update'] = update_fn.apply self, relation_params
 
         # Destroy
-        callback_fn = (id_param, api_name, name, model) ->
-          #(id, callback) =>
-          (element) =>
-            unless callback?
-              callback = (data) =>
-                @[api_name].remove element
-
-            element.destroy callback
-
-            #if options.belongs_to?
-            #  self.api()[name].destroy(options.belongs_to, self.id, id).done callback
-            #else
-            #  self.api()[name].destroy(self.id, id).done callback
-        self[name + '_destroy'] = callback_fn.apply self, self.relationship_fields(name, data.model)
+        self[name + '_destroy'] = destroy_fn.apply self, relation_params
 
     # Set observable fields
     if options.observable?
@@ -181,3 +136,9 @@ Modelize = (options) ->
       mapi.create().done callback
 
   return model
+
+ko.bindingHandlers.sortable.afterMove = (element) ->
+  if element.item.move_ui?
+    element.item.move_ui element
+
+#module.exports = Modelize

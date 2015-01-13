@@ -46,4 +46,9 @@ ko.bindingHandlers.allowEdit =
       element.disabled = true;
       element.readOnly = true;
 
-      $(':input', element).attr('readOnly', 'readOnly')
+      $(':input', element).attr('readOnly', true)
+    else
+      element.disabled = false;
+      element.readOnly = false;
+
+      $(':input', element).attr('readOnly', false)

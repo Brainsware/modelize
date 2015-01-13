@@ -59,6 +59,8 @@ LazyObservable = (self, property, callback, params = [], init_value = null, make
       return _value.remove e
     self[property].push = (e) ->
       return _value.push e
+    self[property].splice = (e, i, args) ->
+      return _value.splice e, i, args
 
   #expose the current state, which can be bound against
   self[property].loaded = ko.observable false

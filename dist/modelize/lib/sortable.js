@@ -8,6 +8,16 @@ Sortable = function(self) {
       }, callback);
     };
   })(this);
+  self.move_ui = (function(_this) {
+    return function(element) {
+      var item, to;
+      item = element.item;
+      to = element.targetIndex;
+      return item.update({
+        sort: to
+      });
+    };
+  })(this);
   return self;
 };
 
