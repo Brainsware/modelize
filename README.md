@@ -3,7 +3,6 @@ Modelize
 
 Modelize is a small model/data interface for REST APIs using KnockoutJS.
 
-This is a super early release. There's still some basic usability stuff missing, but that'll come soon.
 
 Basic Usage
 ========
