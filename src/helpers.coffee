@@ -18,6 +18,21 @@ get_fn = (id_param, api_name, name, model, options) ->
     else
       @.api()[api_name].read(@.id, params).done callback
 
+single_get_fn = (id_param, api_name, name, model, options) ->
+  (params = {}, callbackOrObservable) =>
+    callback = (data) =>
+      @[name] model(data)
+
+    ###if typeof callbackOrObservable == 'undefined' and typeof callbackOrObservable['push'] == 'undefined'
+      if typeof callbackOrObservable != 'function'
+        console.error 'Collection.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven:'
+        console.error callbackOrObservable
+
+      callback = callbackOrObservable
+    ###
+
+    model.get @[id_param], callback
+
 lazy_get_fn = (id_param, api_name, name, model, options) ->
   unless callback?
     callback = (data) =>
