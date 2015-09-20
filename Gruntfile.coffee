@@ -3,7 +3,7 @@ module.exports = (grunt) ->
     uglify:
       options:
         mangle: true
-        compress: true
+        compress: {}
         sourceMap: true
         sourceMapIncludeSources: true
       build:

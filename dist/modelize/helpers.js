@@ -1,4 +1,4 @@
-var create_fn, destroy_fn, get_fn, lazy_get_fn, lazy_single_get_fn, update_fn;
+var create_fn, destroy_fn, get_fn, lazy_get_fn, lazy_single_get_fn, single_get_fn, update_fn;
 
 get_fn = function(id_param, api_name, name, model, options) {
   return (function(_this) {
@@ -18,8 +18,8 @@ get_fn = function(id_param, api_name, name, model, options) {
       };
       if (typeof callbackOrObservable['push'] === 'undefined') {
         if (typeof callbackOrObservable !== 'function') {
-          console.log('Collection.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven:');
-          console.log(callbackOrObservable);
+          console.error('Collection.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven:');
+          console.error(callbackOrObservable);
         }
         callback = callbackOrObservable;
       }
@@ -28,6 +28,29 @@ get_fn = function(id_param, api_name, name, model, options) {
       } else {
         return _this.api()[api_name].read(_this.id, params).done(callback);
       }
+    };
+  })(this);
+};
+
+single_get_fn = function(id_param, api_name, name, model, options) {
+  return (function(_this) {
+    return function(params, callbackOrObservable) {
+      var callback;
+      if (params == null) {
+        params = {};
+      }
+      callback = function(data) {
+        return _this[name](model(data));
+      };
+
+      /*if typeof callbackOrObservable == 'undefined' and typeof callbackOrObservable['push'] == 'undefined'
+        if typeof callbackOrObservable != 'function'
+          console.error 'Collection.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven:'
+          console.error callbackOrObservable
+      
+        callback = callbackOrObservable
+       */
+      return model.get(_this[id_param], callback);
     };
   })(this);
 };
@@ -52,8 +75,12 @@ lazy_get_fn = function(id_param, api_name, name, model, options) {
 
 lazy_single_get_fn = function(id_param, api_name, name, model, options) {
   var callback;
+  if (typeof this[id_param] !== 'function') {
+    console.error('External key not an observable: ' + id_param);
+    return false;
+  }
   if (this[id_param]() == null) {
-    console.log('Tried to access empty relation key: ' + id_param);
+    console.error('Tried to access empty relation key: ' + id_param);
     return false;
   }
   if (typeof callback === "undefined" || callback === null) {
@@ -68,14 +95,24 @@ lazy_single_get_fn = function(id_param, api_name, name, model, options) {
 
 create_fn = function(id_param, api_name, name, model, options) {
   return (function(_this) {
-    return function(params, callback) {
+    return function(params, callback, instant) {
       if (params == null) {
         params = {};
+      }
+      if (instant == null) {
+        instant = false;
       }
       if (callback == null) {
         callback = function(data) {
           return _this[api_name].push(model(data));
         };
+      }
+      if (_this.id == null) {
+        console.error('Empty ID. Save parent model first!');
+        return;
+      }
+      if (model.encrypted_container != null) {
+        params = model.encrypt_container(params);
       }
       if (options.belongs_to != null) {
         return _this.api()[api_name].create(options.belongs_to, _this.id, params).done(callback);
@@ -89,10 +126,20 @@ create_fn = function(id_param, api_name, name, model, options) {
 update_fn = function(id_param, api_name, name, model, options) {
   return (function(_this) {
     return function(id, params, callback) {
+      if (_this.id == null) {
+        console.error('Empty ID. Save parent model first!');
+        return;
+      }
+      if (model.encrypted_container != null) {
+        params = model.encrypt_container(params);
+      }
       if (options.belongs_to != null) {
-        return _this.api()[api_name].update(options.belongs_to, _this.id, id, params).done(callback);
+        _this.api()[api_name].update(options.belongs_to, _this.id, id, params).done(callback);
       } else {
-        return _this.api()[api_name].update(_this.id, id, params).done(callback);
+        _this.api()[api_name].update(_this.id, id, params).done(callback);
+      }
+      if (_this.after_update != null) {
+        return _this.after_update();
       }
     };
   })(this);
@@ -105,6 +152,10 @@ destroy_fn = function(id_param, api_name, name, model, options) {
         callback = function(data) {
           return _this[api_name].remove(element);
         };
+      }
+      if (_this.id == null) {
+        console.error('Empty ID. Save parent model first!');
+        return;
       }
       if (options.belongs_to != null) {
         return _this.api()[api_name].destroy(options.belongs_to, _this.id, id).done(callback);
