@@ -30,7 +30,7 @@ Modelize = (options) ->
     # Check if de/encryption functions should be included
     #
     if options.encrypted_container?
-      Encryptable self, options.encrypted_container
+      Encryptable self, options.encrypted_container, options.encrypted_editable
 
     # Include sortable functions
     if options.sortable? && options.sortable == true
@@ -47,6 +47,8 @@ Modelize = (options) ->
       unless options.has_one?
         options.has_one = []
       options.has_one = Ham.merge options.belongs_to, options.has_one
+    else
+      options.belongs_to = []
 
     # Single relations
     # Generated methods:
@@ -67,12 +69,12 @@ Modelize = (options) ->
 
         fn = window[data.model]
         
-        ###if typeof self[name + '_id'] != 'function'
+        if typeof self[name + '_id'] != 'function' && name not in options.belongs_to
           unless options.editable?
             options.editable = []
 
-          #options.editable.push name + '_id'
-        ###
+          options.editable.push name + '_id'
+        
 
         if self[name]?
           Observable self, name, new fn(self[name])
@@ -191,6 +193,11 @@ Modelize = (options) ->
       mapi.create(self.export()).done (data) =>
         self.id = data.id
 
+        if options.encrypted_container?
+          self.enc_update data
+
+        callback()
+
     # Export all model data as an array
     #
     self.export = =>
@@ -228,6 +235,10 @@ Modelize = (options) ->
         console.log callbackOrObservable
 
       callback = callbackOrObservable
+
+    if typeof params != 'object'
+      console.error params, typeof params
+      return
 
     if params? && params.id?
       mapi.read(params.id, params).done callback
