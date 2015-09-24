@@ -31,7 +31,7 @@ single_get_fn = (id_param, api_name, name, model, options) ->
       callback = callbackOrObservable
     ###
 
-    model.get @[id_param], callback
+    model.get @[id_param](), callback
 
 lazy_get_fn = (id_param, api_name, name, model, options) ->
   unless callback?
@@ -71,7 +71,7 @@ create_fn = (id_param, api_name, name, model, options) ->
     if model.encrypted_container?
       params = model.encrypt_container(params)
 
-    if options.belongs_to?
+    if options.belongs_to.length > 0
       @.api()[api_name].create(options.belongs_to, @.id, params).done callback
     else
       @.api()[api_name].create(@.id, params).done callback
