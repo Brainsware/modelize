@@ -8,21 +8,13 @@ Editable = function(self, property, callback) {
     console.error('Editable field "' + property + '" is not a valid Observable');
     return false;
   }
-  Observable(self, editing_property, self[property]() === '' || (self[property]() == null));
+  Observable(self, editing_property, 0);
   self[property].subscribe((function(_this) {
     return function(new_value) {
       var r;
-      r = callback(new_value, property);
-      if (r !== true) {
-        return self[editing_property](false);
-      }
+      return r = callback(new_value, property);
     };
   })(this));
-  self['edit_' + property] = (function(_this) {
-    return function() {
-      return self[editing_property](true);
-    };
-  })(this);
   return self;
 };
 
@@ -33,6 +25,9 @@ DelayedSave = function(options, self) {
         delay = 250;
       }
       if (self.id != null) {
+        if (self['editing_' + prop] != null) {
+          self['editing_' + prop](1);
+        }
         if (window.timeoutEditor == null) {
           window.timeoutEditor = {};
         }
@@ -42,6 +37,9 @@ DelayedSave = function(options, self) {
         clearTimeout(window.timeoutEditor[options.api + self.id][prop]);
         return window.timeoutEditor[options.api + self.id][prop] = setTimeout(function() {
           var edit_value;
+          if (self['editing_' + prop] != null) {
+            self['editing_' + prop](2);
+          }
           edit_value = {};
           edit_value[prop] = value;
           return self.update(edit_value);
@@ -68,6 +66,7 @@ EncryptedDelayedSave = function(options, self) {
       }
       self[options.encrypted_container][prop] = value;
       if (self.id != null) {
+        self['editing_' + prop](1);
         if (window.timeoutEditor == null) {
           window.timeoutEditor = {};
         }
@@ -75,6 +74,7 @@ EncryptedDelayedSave = function(options, self) {
         return window.timeoutEditor[options.api + self.id] = setTimeout(function() {
           var edit_value;
           self.save_encrypted_container();
+          self['editing_' + prop](2);
           edit_value = {};
           edit_value[prop] = value;
           return self.update(edit_value);

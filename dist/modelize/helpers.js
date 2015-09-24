@@ -50,7 +50,7 @@ single_get_fn = function(id_param, api_name, name, model, options) {
       
         callback = callbackOrObservable
        */
-      return model.get(_this[id_param], callback);
+      return model.get(_this[id_param](), callback);
     };
   })(this);
 };
@@ -114,7 +114,7 @@ create_fn = function(id_param, api_name, name, model, options) {
       if (model.encrypted_container != null) {
         params = model.encrypt_container(params);
       }
-      if (options.belongs_to != null) {
+      if (options.belongs_to.length > 0) {
         return _this.api()[api_name].create(options.belongs_to, _this.id, params).done(callback);
       } else {
         return _this.api()[api_name].create(_this.id, params).done(callback);

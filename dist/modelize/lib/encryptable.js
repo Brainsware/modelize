@@ -1,28 +1,28 @@
 var Encryptable,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-Encryptable = function(self, container) {
-  var _i, _len;
+Encryptable = function(self, encrypted_container, encrypted_editable) {
+  var container, _i, _len;
   self.decrypt = (function(_this) {
-    return function(container) {
+    return function(encrypted_container) {
       var dencdata, index, value, _results;
-      if (typeof container === 'string' && container !== null && container !== '') {
-        dencdata = decryptData(sessionStorage.getItem('appKey'), container);
-        container = JSON.parse(dencdata);
+      if (typeof encrypted_container === 'string' && encrypted_container !== null && encrypted_container !== '') {
+        dencdata = decryptData(sessionStorage.getItem('appKey'), encrypted_container);
+        encrypted_container = JSON.parse(dencdata);
         _results = [];
-        for (index in container) {
-          value = container[index];
+        for (index in encrypted_container) {
+          value = encrypted_container[index];
           _results.push(self[index] = value);
         }
         return _results;
       }
     };
   })(this);
-  if (typeof container === 'string') {
-    self.decrypt(self[container]);
-  } else if (typeof container === 'object') {
-    for (_i = 0, _len = container.length; _i < _len; _i++) {
-      container = container[_i];
+  if (typeof encrypted_container === 'string') {
+    self.decrypt(self[encrypted_container]);
+  } else if (typeof encrypted_container === 'object') {
+    for (_i = 0, _len = encrypted_container.length; _i < _len; _i++) {
+      container = encrypted_container[_i];
       self.decrypt(self[container]);
     }
   }
@@ -31,25 +31,25 @@ Encryptable = function(self, container) {
       var index, value;
       for (index in data) {
         value = data[index];
-        if (__indexOf.call(options.encrypted_editable, index) >= 0) {
-          if (typeof self[options.encrypted_container] !== 'object' || self[options.encrypted_container] === null) {
-            self[options.encrypted_container] = {};
+        if (__indexOf.call(encrypted_editable, index) >= 0) {
+          if (typeof self[encrypted_container] !== 'object' || self[encrypted_container] === null) {
+            self[encrypted_container] = {};
           }
-          self[options.encrypted_container][index] = value;
+          self[encrypted_container][index] = value;
         }
       }
-      self.save_encrypted_container();
+      self.save_encrypted_encrypted_container();
       if (callback != null) {
         return callback();
       }
     };
   })(this);
-  self.save_encrypted_container = (function(_this) {
+  self.save_encrypted_encrypted_container = (function(_this) {
     return function() {
       var edit_value, encdata;
-      encdata = encryptData(sessionStorage.getItem('appKey'), JSON.stringify(self[options.encrypted_container]));
+      encdata = encryptData(sessionStorage.getItem('appKey'), JSON.stringify(self[encrypted_container]));
       edit_value = {};
-      edit_value[options.encrypted_container] = encdata;
+      edit_value[encrypted_container] = encdata;
       return self.update(edit_value);
     };
   })(this);

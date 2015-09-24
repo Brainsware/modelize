@@ -26,7 +26,7 @@ Modelize = function(options) {
       return [name + '_id', name + 's', name, window[model]];
     };
     if (options.encrypted_container != null) {
-      Encryptable(self, options.encrypted_container);
+      Encryptable(self, options.encrypted_container, options.encrypted_editable);
     }
     if ((options.sortable != null) && options.sortable === true) {
       Sortable(self);
@@ -39,6 +39,8 @@ Modelize = function(options) {
         options.has_one = [];
       }
       options.has_one = Ham.merge(options.belongs_to, options.has_one);
+    } else {
+      options.belongs_to = [];
     }
     if (options.has_one != null) {
       _ref = options.has_one;
@@ -50,13 +52,12 @@ Modelize = function(options) {
         relation_params = self.relationship_fields(name, data.model);
         relation_params.push(options);
         fn = window[data.model];
-
-        /*if typeof self[name + '_id'] != 'function'
-          unless options.editable?
-            options.editable = []
-        
-           *options.editable.push name + '_id'
-         */
+        if (typeof self[name + '_id'] !== 'function' && __indexOf.call(options.belongs_to, name) < 0) {
+          if (options.editable == null) {
+            options.editable = [];
+          }
+          options.editable.push(name + '_id');
+        }
         if (self[name] != null) {
           Observable(self, name, new fn(self[name]));
         } else {
@@ -162,7 +163,11 @@ Modelize = function(options) {
     self.create = (function(_this) {
       return function(callback) {
         return mapi.create(self["export"]()).done(function(data) {
-          return self.id = data.id;
+          self.id = data.id;
+          if (options.encrypted_container != null) {
+            self.enc_update(data);
+          }
+          return callback();
         });
       };
     })(this);
@@ -220,6 +225,10 @@ Modelize = function(options) {
         console.log(callbackOrObservable);
       }
       callback = callbackOrObservable;
+    }
+    if (typeof params !== 'object') {
+      console.error(params, typeof params);
+      return;
     }
     if ((params != null) && (params.id != null)) {
       return mapi.read(params.id, params).done(callback);
