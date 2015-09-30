@@ -22,10 +22,6 @@ Modelize = (options) ->
     # Return api object
     #
     self.api = -> mapi
-    # Provide all required relationship fields
-    # externalkey (modelname_id), modelplural for API, modelname, modelfunction
-    #
-    self.relationship_fields = (name, model) -> [name + '_id', name + 's', name, window[model]]
 
     # Check if de/encryption functions should be included
     #
@@ -64,8 +60,7 @@ Modelize = (options) ->
         Ham.merge data,
           model: name.capitalize()
 
-        relation_params = self.relationship_fields name, data.model
-        relation_params.push options
+        relation_params = relationship_fields name, data.model, options
 
         fn = window[data.model]
         
@@ -79,7 +74,7 @@ Modelize = (options) ->
         if self[name]?
           Observable self, name, new fn(self[name])
         else
-          LazyObservable self, name, lazy_single_get_fn, self.relationship_fields(name, data.model)
+          LazyObservable self, name, lazy_single_get_fn, relation_params
 
         self[name + '_get'] = single_get_fn.apply self, relation_params
 
@@ -104,8 +99,7 @@ Modelize = (options) ->
         Ham.merge data,
           model: name.capitalize()
         
-        relation_params = self.relationship_fields name, data.model
-        relation_params.push options
+        relation_params = relationship_fields name, data.model, options
 
         # Get
         #

@@ -1,4 +1,9 @@
-get_fn = (id_param, api_name, name, model, options) ->
+# Provide all required relationship fields
+# externalkey (modelname_id), modelplural for API, modelname, modelfunction
+#
+relationship_fields = (name, model, options = {}) -> [name + '_id', name + 's', name, window[model], options]
+
+get_fn = (id_param, api_name, name, model, options = {}) ->
   (params = {}, callbackOrObservable) =>
     callback = (data) =>
       res = []
@@ -18,7 +23,7 @@ get_fn = (id_param, api_name, name, model, options) ->
     else
       @.api()[api_name].read(@.id, params).done callback
 
-single_get_fn = (id_param, api_name, name, model, options) ->
+single_get_fn = (id_param, api_name, name, model, options = {}) ->
   (params = {}, callbackOrObservable) =>
     callback = (data) =>
       @[name] model(data)
@@ -31,7 +36,7 @@ single_get_fn = (id_param, api_name, name, model, options) ->
       callback = callbackOrObservable
     ###
 
-    model.get @[id_param](), callback
+    model.getOne @[id_param](), callback
 
 lazy_get_fn = (id_param, api_name, name, model, options) ->
   unless callback?
@@ -56,7 +61,7 @@ lazy_single_get_fn = (id_param, api_name, name, model, options) ->
     callback = (data) =>
       @[name] model(data)
   
-  model.get @[id_param](), callback
+  model.getOne @[id_param](), callback
 
 create_fn = (id_param, api_name, name, model, options) ->
   (params = {}, callback, instant = false) =>
