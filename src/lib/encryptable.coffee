@@ -30,7 +30,7 @@ Encryptable = (self, encrypted_container, encrypted_editable) ->
     if callback?
       callback()
   
-  self.save_encrypted_encrypted_container = =>
+  self.save_encrypted_container = =>
     encdata = encryptData(sessionStorage.getItem('appKey'), JSON.stringify(self[encrypted_container]))
 
     edit_value = {}
