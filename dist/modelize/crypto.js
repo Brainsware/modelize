@@ -1,10 +1,7 @@
-var decryptData, encryptData, generateKey, generateSalt;
+var decryptData, encryptData, generateKey, generateSalt, getHash;
 
-generateKey = function(password, salt, decrypting) {
-  var hex, key, options;
-  if (decrypting == null) {
-    decrypting = false;
-  }
+generateKey = function(password, salt) {
+  var hex, options;
   if (password === '') {
     console.error('Password for key generation empty!');
     return false;
@@ -18,8 +15,7 @@ generateKey = function(password, salt, decrypting) {
     iter: 5000
   };
   options = sjcl.misc.cachedPbkdf2(password, options);
-  key = sjcl.codec.hex.fromBits(options.key);
-  return key;
+  return sjcl.codec.hex.fromBits(options.key);
 };
 
 generateSalt = function(length) {
@@ -28,12 +24,11 @@ generateSalt = function(length) {
     length = 2;
   }
   rand = sjcl.random.randomWords(length);
-  rand = sjcl.codec.hex.fromBits(rand);
-  return rand;
+  return sjcl.codec.hex.fromBits(rand);
 };
 
 encryptData = function(key, data, adata) {
-  var encdata, options, options_ret;
+  var options, options_ret;
   if (adata == null) {
     adata = '';
   }
@@ -49,11 +44,10 @@ encryptData = function(key, data, adata) {
     adata: adata
   };
   options_ret = {};
-  encdata = sjcl.encrypt(key, data, options, options_ret);
-  return encdata;
+  return sjcl.encrypt(key, data, options, options_ret);
 };
 
-decryptData = function(key, data, adata) {
+decryptData = function(key, data) {
   var options_ret;
   if (key === '') {
     console.error('Decryption key empty!');
@@ -61,6 +55,16 @@ decryptData = function(key, data, adata) {
   }
   options_ret = {};
   return sjcl.decrypt(key, data, {}, options_ret);
+};
+
+getHash = function(value) {
+  var hash;
+  if (value == null) {
+    console.debug('Hash value empty');
+    value = '';
+  }
+  hash = sjcl.hash.sha256.hash(value);
+  return sjcl.codec.hex.fromBits(hash);
 };
 
 //# sourceMappingURL=crypto.js.map

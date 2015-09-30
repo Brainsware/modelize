@@ -44,7 +44,7 @@ Encryptable = function(self, encrypted_container, encrypted_editable) {
       }
     };
   })(this);
-  self.save_encrypted_encrypted_container = (function(_this) {
+  self.save_encrypted_container = (function(_this) {
     return function() {
       var edit_value, encdata;
       encdata = encryptData(sessionStorage.getItem('appKey'), JSON.stringify(self[encrypted_container]));

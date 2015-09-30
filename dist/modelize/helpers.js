@@ -1,6 +1,16 @@
-var create_fn, destroy_fn, get_fn, lazy_get_fn, lazy_single_get_fn, single_get_fn, update_fn;
+var create_fn, destroy_fn, get_fn, lazy_get_fn, lazy_single_get_fn, relationship_fields, single_get_fn, update_fn;
+
+relationship_fields = function(name, model, options) {
+  if (options == null) {
+    options = {};
+  }
+  return [name + '_id', name + 's', name, window[model], options];
+};
 
 get_fn = function(id_param, api_name, name, model, options) {
+  if (options == null) {
+    options = {};
+  }
   return (function(_this) {
     return function(params, callbackOrObservable) {
       var callback;
@@ -33,6 +43,9 @@ get_fn = function(id_param, api_name, name, model, options) {
 };
 
 single_get_fn = function(id_param, api_name, name, model, options) {
+  if (options == null) {
+    options = {};
+  }
   return (function(_this) {
     return function(params, callbackOrObservable) {
       var callback;
@@ -50,7 +63,7 @@ single_get_fn = function(id_param, api_name, name, model, options) {
       
         callback = callbackOrObservable
        */
-      return model.get(_this[id_param](), callback);
+      return model.getOne(_this[id_param](), callback);
     };
   })(this);
 };
@@ -90,7 +103,7 @@ lazy_single_get_fn = function(id_param, api_name, name, model, options) {
       };
     })(this);
   }
-  return model.get(this[id_param](), callback);
+  return model.getOne(this[id_param](), callback);
 };
 
 create_fn = function(id_param, api_name, name, model, options) {

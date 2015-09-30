@@ -22,9 +22,6 @@ Modelize = function(options) {
     self.api = function() {
       return mapi;
     };
-    self.relationship_fields = function(name, model) {
-      return [name + '_id', name + 's', name, window[model]];
-    };
     if (options.encrypted_container != null) {
       Encryptable(self, options.encrypted_container, options.encrypted_editable);
     }
@@ -49,8 +46,7 @@ Modelize = function(options) {
         Ham.merge(data, {
           model: name.capitalize()
         });
-        relation_params = self.relationship_fields(name, data.model);
-        relation_params.push(options);
+        relation_params = relationship_fields(name, data.model, options);
         fn = window[data.model];
         if (typeof self[name + '_id'] !== 'function' && __indexOf.call(options.belongs_to, name) < 0) {
           if (options.editable == null) {
@@ -61,7 +57,7 @@ Modelize = function(options) {
         if (self[name] != null) {
           Observable(self, name, new fn(self[name]));
         } else {
-          LazyObservable(self, name, lazy_single_get_fn, self.relationship_fields(name, data.model));
+          LazyObservable(self, name, lazy_single_get_fn, relation_params);
         }
         self[name + '_get'] = single_get_fn.apply(self, relation_params);
       }
@@ -73,8 +69,7 @@ Modelize = function(options) {
         Ham.merge(data, {
           model: name.capitalize()
         });
-        relation_params = self.relationship_fields(name, data.model);
-        relation_params.push(options);
+        relation_params = relationship_fields(name, data.model, options);
         if (self[name + 's'] != null) {
           fn = window[data.model];
           items = [];
