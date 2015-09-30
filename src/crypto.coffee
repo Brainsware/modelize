@@ -1,4 +1,6 @@
-generateKey = (password, salt, decrypting = false) ->
+# Generate key with Pbkdf2
+#
+generateKey = (password, salt) ->
   if password == ''
     console.error 'Password for key generation empty!'
     return false
@@ -14,19 +16,20 @@ generateKey = (password, salt, decrypting = false) ->
 
   options = sjcl.misc.cachedPbkdf2(password, options)
 
-  key = sjcl.codec.hex.fromBits(options.key)
+  return sjcl.codec.hex.fromBits options.key
 
-  return key
-
+# Generate salt
+#
+# @param [int] length specifies the number of words produced
+#
 generateSalt = (length = 2) ->
-  rand = sjcl.random.randomWords(length)
+  rand = sjcl.random.randomWords length
   
-  rand = sjcl.codec.hex.fromBits(rand)
+  return sjcl.codec.hex.fromBits rand
 
-  #rand = rand.toUpperCase().replace(/// ///g,'').replace(///(.{8})///g, "$1 ").replace(/// $///, '')
-
-  return rand
-
+# Encrypt data with key
+# Method used: AES/GCM
+#
 encryptData = (key, data, adata = '') ->
   if key == ''
     console.error 'Encryption key empty!'
@@ -41,15 +44,25 @@ encryptData = (key, data, adata = '') ->
 
   options_ret = {}
 
-  encdata = sjcl.encrypt key, data, options, options_ret
+  return sjcl.encrypt key, data, options, options_ret
 
-  return encdata
-
-decryptData = (key, data, adata) ->
+# Decrypt data with key
+#
+decryptData = (key, data) ->
   if key == ''
     console.error 'Decryption key empty!'
     return false
 
   options_ret = {}
 
-  sjcl.decrypt key, data, {}, options_ret
+  return sjcl.decrypt key, data, {}, options_ret
+
+# Generate SHA256 hash from given string
+#
+getHash = (value) ->
+  unless value?
+    console.debug 'Hash value empty'
+    value = ''
+
+  hash = sjcl.hash.sha256.hash value
+  return sjcl.codec.hex.fromBits hash
