@@ -1,6 +1,7 @@
 {
   "name": "modelize",
   "version": "1.0.3",
+  "main": "dist/modelize.min.js",
   "description": "REST model interface for KnockoutJS",
   "homepage": "http://brainsware.org",
   "author": "Daniel Khalil <d.khalil@brainsware.org>",
@@ -17,6 +18,9 @@
     "sjcl": "1.*",
     "jquery": "2.1",
     "jquery.rest": "*"
+  },
+  "devDependencies": {
+    "jasmine-core": "2.*"
   },
   "ignore": [
     "**/.*",
