@@ -52,15 +52,15 @@ DelayedSave = function(options, self) {
 EncryptedDelayedSave = function(options, self) {
   return (function(_this) {
     return function(value, prop, delay) {
-      var index, name, _ref;
+      var index, name, ref;
       if (delay == null) {
         delay = 250;
       }
       if (typeof self[options.encrypted_container] !== 'object' || self[options.encrypted_container] === null) {
         self[options.encrypted_container] = {};
-        _ref = options.encrypted_editable;
-        for (index in _ref) {
-          name = _ref[index];
+        ref = options.encrypted_editable;
+        for (index in ref) {
+          name = ref[index];
           self[options.encrypted_container][name] = self[name]();
         }
       }

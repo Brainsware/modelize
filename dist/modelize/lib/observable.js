@@ -65,6 +65,7 @@ LazyObservable = function(self, property, callback, params, init_value, make_arr
   self[property] = ko.computed({
     read: function() {
       if (self[property].loaded() === false) {
+        console.debug('LazyLoading property', property);
         callback.apply(self, params);
       }
       return _value();
@@ -88,7 +89,7 @@ LazyObservable = function(self, property, callback, params, init_value, make_arr
   }
   self[property].loaded = ko.observable(false);
   return self[property].refresh = function() {
-    return result.loaded(false);
+    return self[property].loaded(false);
   };
 };
 

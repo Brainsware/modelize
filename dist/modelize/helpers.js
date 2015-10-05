@@ -18,10 +18,10 @@ get_fn = function(id_param, api_name, name, model, options) {
         params = {};
       }
       callback = function(data) {
-        var m, res, _i, _len;
+        var i, len, m, res;
         res = [];
-        for (_i = 0, _len = data.length; _i < _len; _i++) {
-          m = data[_i];
+        for (i = 0, len = data.length; i < len; i++) {
+          m = data[i];
           res.push(model(m));
         }
         return _this[api_name](res);
@@ -73,10 +73,10 @@ lazy_get_fn = function(id_param, api_name, name, model, options) {
   if (typeof callback === "undefined" || callback === null) {
     callback = (function(_this) {
       return function(data) {
-        var m, res, _i, _len;
+        var i, len, m, res;
         res = [];
-        for (_i = 0, _len = data.length; _i < _len; _i++) {
-          m = data[_i];
+        for (i = 0, len = data.length; i < len; i++) {
+          m = data[i];
           res.push(model(m));
         }
         return _this[api_name](res);
@@ -94,6 +94,10 @@ lazy_single_get_fn = function(id_param, api_name, name, model, options) {
   }
   if (this[id_param]() == null) {
     console.error('Tried to access empty relation key: ' + id_param);
+    return false;
+  }
+  if (typeof this[id_param]() === 'function') {
+    console.error('Circular referene? Quitting.');
     return false;
   }
   if (typeof callback === "undefined" || callback === null) {

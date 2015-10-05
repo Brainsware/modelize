@@ -1,6 +1,6 @@
 'use strict';
 var Modelize,
-  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 Modelize = function(options) {
   var mapi, model;
@@ -15,7 +15,7 @@ Modelize = function(options) {
     add_apis_to(options.has_many, options.api);
   }
   model = function(self) {
-    var data, fn, index, item, items, name, relation_params, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+    var data, fn, i, index, item, items, len, name, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, relation_params;
     if (self == null) {
       self = {};
     }
@@ -40,15 +40,15 @@ Modelize = function(options) {
       options.belongs_to = [];
     }
     if (options.has_one != null) {
-      _ref = options.has_one;
-      for (name in _ref) {
-        data = _ref[name];
+      ref = options.has_one;
+      for (name in ref) {
+        data = ref[name];
         Ham.merge(data, {
           model: name.capitalize()
         });
         relation_params = relationship_fields(name, data.model, options);
         fn = window[data.model];
-        if (typeof self[name + '_id'] !== 'function' && __indexOf.call(options.belongs_to, name) < 0) {
+        if (typeof self[name + '_id'] !== 'function' && indexOf.call(options.belongs_to, name) < 0) {
           if (options.editable == null) {
             options.editable = [];
           }
@@ -57,15 +57,15 @@ Modelize = function(options) {
         if (self[name] != null) {
           Observable(self, name, new fn(self[name]));
         } else {
-          LazyObservable(self, name, lazy_single_get_fn, relation_params);
+          Observable(self, name, new fn());
         }
         self[name + '_get'] = single_get_fn.apply(self, relation_params);
       }
     }
     if (options.has_many != null) {
-      _ref1 = options.has_many;
-      for (name in _ref1) {
-        data = _ref1[name];
+      ref1 = options.has_many;
+      for (name in ref1) {
+        data = ref1[name];
         Ham.merge(data, {
           model: name.capitalize()
         });
@@ -73,14 +73,14 @@ Modelize = function(options) {
         if (self[name + 's'] != null) {
           fn = window[data.model];
           items = [];
-          _ref2 = self[name + 's'];
-          for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-            item = _ref2[_i];
+          ref2 = self[name + 's'];
+          for (i = 0, len = ref2.length; i < len; i++) {
+            item = ref2[i];
             items.push(new fn(item));
           }
           ObservableArray(self, name + 's', items);
         } else {
-          LazyObservableArray(self, name + 's', lazy_get_fn, relation_params);
+          ObservableArray(self, name + 's', []);
         }
         self[name + '_get'] = get_fn.apply(self, relation_params);
         self[name + '_add'] = create_fn.apply(self, relation_params);
@@ -89,51 +89,51 @@ Modelize = function(options) {
       }
     }
     if (options.observable != null) {
-      _ref3 = options.observable;
-      for (index in _ref3) {
-        name = _ref3[index];
+      ref3 = options.observable;
+      for (index in ref3) {
+        name = ref3[index];
         Observable(self, name);
       }
     }
     if (options.editable != null) {
-      _ref4 = options.editable;
-      for (index in _ref4) {
-        name = _ref4[index];
+      ref4 = options.editable;
+      for (index in ref4) {
+        name = ref4[index];
         Editable(self, name, DelayedSave.apply(self, [options, self]));
       }
     }
     if (options.encrypted_editable != null) {
-      _ref5 = options.encrypted_editable;
-      for (index in _ref5) {
-        name = _ref5[index];
+      ref5 = options.encrypted_editable;
+      for (index in ref5) {
+        name = ref5[index];
         Editable(self, name, EncryptedDelayedSave.apply(self, [options, self]));
       }
     }
     if (options.computed != null) {
-      _ref6 = options.computed;
-      for (name in _ref6) {
-        fn = _ref6[name];
+      ref6 = options.computed;
+      for (name in ref6) {
+        fn = ref6[name];
         Computed(self, name, fn);
       }
     }
     if (options.purecomputed != null) {
-      _ref7 = options.purecomputed;
-      for (name in _ref7) {
-        fn = _ref7[name];
+      ref7 = options.purecomputed;
+      for (name in ref7) {
+        fn = ref7[name];
         PureComputed(self, name, fn);
       }
     }
     if (options.computed_array != null) {
-      _ref8 = options.computed_array;
-      for (name in _ref8) {
-        fn = _ref8[name];
+      ref8 = options.computed_array;
+      for (name in ref8) {
+        fn = ref8[name];
         ComputedArray(self, name, fn);
       }
     }
     if (options.functions != null) {
-      _ref9 = options.functions;
-      for (name in _ref9) {
-        fn = _ref9[name];
+      ref9 = options.functions;
+      for (name in ref9) {
+        fn = ref9[name];
         self[name] = fn;
       }
     }
@@ -168,26 +168,26 @@ Modelize = function(options) {
     })(this);
     self["export"] = (function(_this) {
       return function() {
-        var has_data, _ref10, _ref11, _ref12;
+        var has_data, ref10, ref11, ref12;
         data = {};
         if (options.editable != null) {
-          _ref10 = options.editable;
-          for (index in _ref10) {
-            name = _ref10[index];
+          ref10 = options.editable;
+          for (index in ref10) {
+            name = ref10[index];
             data[name] = self[name]();
           }
         }
         if (options.encrypted_editable != null) {
-          _ref11 = options.encrypted_editable;
-          for (index in _ref11) {
-            name = _ref11[index];
+          ref11 = options.encrypted_editable;
+          for (index in ref11) {
+            name = ref11[index];
             data[name] = self[name]();
           }
         }
         if (options.belongs_to != null) {
-          _ref12 = options.belongs_to;
-          for (name in _ref12) {
-            has_data = _ref12[name];
+          ref12 = options.belongs_to;
+          for (name in ref12) {
+            has_data = ref12[name];
             data[name + '_id'] = self[name + '_id'];
           }
         }
@@ -206,13 +206,13 @@ Modelize = function(options) {
       params = {};
     }
     callback = function(data) {
-      var m, _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = data.length; _i < _len; _i++) {
-        m = data[_i];
-        _results.push(callbackOrObservable.push(model(m)));
+      var i, len, m, results;
+      results = [];
+      for (i = 0, len = data.length; i < len; i++) {
+        m = data[i];
+        results.push(callbackOrObservable.push(model(m)));
       }
-      return _results;
+      return results;
     };
     if (typeof callbackOrObservable['push'] === 'undefined') {
       if (typeof callbackOrObservable !== 'function') {
@@ -280,7 +280,7 @@ Modelize = function(options) {
     data[model.encrypted_container] = {};
     for (index in data) {
       value = data[index];
-      if (__indexOf.call(model.encrypted_editable, index) >= 0) {
+      if (indexOf.call(model.encrypted_editable, index) >= 0) {
         data[model.encrypted_container][index] = value;
       }
     }

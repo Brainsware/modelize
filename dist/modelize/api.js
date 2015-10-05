@@ -16,17 +16,17 @@ api = new $.RestClient('/api/', {
 });
 
 add_apis_to = function(sub_apis, main_api) {
-  var data, name, _results;
-  _results = [];
+  var data, name, results;
+  results = [];
   for (name in sub_apis) {
     data = sub_apis[name];
     if (!api[main_api][name + 's']) {
-      _results.push(api[main_api].add(name + 's'));
+      results.push(api[main_api].add(name + 's'));
     } else {
-      _results.push(void 0);
+      results.push(void 0);
     }
   }
-  return _results;
+  return results;
 };
 
 //# sourceMappingURL=api.js.map

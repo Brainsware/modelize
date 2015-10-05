@@ -3,16 +3,16 @@ var Ham;
 Ham = function() {};
 
 Ham.merge = function(a, b) {
-  var key, result, _i, _j, _len, _len1, _ref, _ref1;
+  var i, j, key, len, len1, ref, ref1, result;
   result = {};
-  _ref = Object.keys(a);
-  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-    key = _ref[_i];
+  ref = Object.keys(a);
+  for (i = 0, len = ref.length; i < len; i++) {
+    key = ref[i];
     result[key] = a[key];
   }
-  _ref1 = Object.keys(b);
-  for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-    key = _ref1[_j];
+  ref1 = Object.keys(b);
+  for (j = 0, len1 = ref1.length; j < len1; j++) {
+    key = ref1[j];
     if (a[key] == null) {
       result[key] = b[key];
     }
