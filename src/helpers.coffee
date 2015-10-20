@@ -1,9 +1,9 @@
 # Provide all required relationship fields
 # externalkey (modelname_id), modelplural for API, modelname, modelfunction
 #
-relationship_fields = (name, model, options = {}) -> [name + '_id', name + 's', name, window[model], options]
+relationship_fields = (name, model, connector, options = {}) -> [name + '_id', name + 's', name, window[model], connector, options]
 
-get_fn = (id_param, api_name, name, model, options = {}) ->
+get_fn = (id_param, api_name, name, model, connector, options = {}) ->
   (params = {}, callbackOrObservable) =>
     callback = (data) =>
       res = []
@@ -18,12 +18,18 @@ get_fn = (id_param, api_name, name, model, options = {}) ->
 
       callback = callbackOrObservable
 
-    if options.belongs_to?
-      @.api()[api_name].read(options.belongs_to, @.id, params).done callback
-    else
-      @.api()[api_name].read(@.id, params).done callback
+    api = connector.get api_name
 
-single_get_fn = (id_param, api_name, name, model, options = {}) ->
+    unless api?
+      console.error 'No Connector found for resource "' + api_name + '" found: ', api
+      return false
+
+    if options.belongs_to?
+      api.read(options.belongs_to, @.id, params).done callback
+    else
+      api.read(@.id, params).done callback
+
+single_get_fn = (id_param, api_name, name, model, connector, options = {}) ->
   (params = {}, callbackOrObservable) =>
     callback = (data) =>
       @[name] model(data)
@@ -36,9 +42,9 @@ single_get_fn = (id_param, api_name, name, model, options = {}) ->
       callback = callbackOrObservable
     ###
 
-    model.getOne @[id_param](), callback
+    model.get_one @[id_param](), callback
 
-lazy_get_fn = (id_param, api_name, name, model, options) ->
+lazy_get_fn = (id_param, api_name, name, model, connector, options) ->
   unless callback?
     callback = (data) =>
       res = []
@@ -46,9 +52,11 @@ lazy_get_fn = (id_param, api_name, name, model, options) ->
         res.push model(m)
       @[api_name] res
 
-    @.api()[api_name].read(@.id).done callback
+    api = connector.get api_name
 
-lazy_single_get_fn = (id_param, api_name, name, model, options) ->
+    api.read(@.id).done callback
+
+lazy_single_get_fn = (id_param, api_name, name, model, connector, options) ->
   if typeof @[id_param] != 'function'
     console.error 'External key not an observable: ' + id_param
     return false
@@ -56,14 +64,18 @@ lazy_single_get_fn = (id_param, api_name, name, model, options) ->
   unless @[id_param]()?
     console.error 'Tried to access empty relation key: ' + id_param
     return false
+
+  if typeof @[id_param]() == 'function'
+    console.error 'Circular referene? Quitting.'
+    return false
   
   unless callback?
     callback = (data) =>
       @[name] model(data)
   
-  model.getOne @[id_param](), callback
+  model.get_one @[id_param](), callback
 
-create_fn = (id_param, api_name, name, model, options) ->
+create_fn = (id_param, api_name, name, model, connector, options) ->
   (params = {}, callback, instant = false) =>
     unless callback?
       callback = (data) =>
@@ -76,12 +88,14 @@ create_fn = (id_param, api_name, name, model, options) ->
     if model.encrypted_container?
       params = model.encrypt_container(params)
 
-    if options.belongs_to.length > 0
-      @.api()[api_name].create(options.belongs_to, @.id, params).done callback
-    else
-      @.api()[api_name].create(@.id, params).done callback
+    api = connector.get api_name
 
-update_fn = (id_param, api_name, name, model, options) ->
+    if options.belongs_to.length > 0
+      api.create(options.belongs_to, @.id, params).done callback
+    else
+      api.create(@.id, params).done callback
+
+update_fn = (id_param, api_name, name, model, connector, options) ->
   (id, params, callback) =>
     unless @.id?
       console.error 'Empty ID. Save parent model first!'
@@ -90,15 +104,17 @@ update_fn = (id_param, api_name, name, model, options) ->
     if model.encrypted_container?
       params = model.encrypt_container(params)
 
+    api = connector.get api_name
+
     if options.belongs_to?
-      @.api()[api_name].update(options.belongs_to, @.id, id, params).done callback
+      api.update(options.belongs_to, @.id, id, params).done callback
     else
-      @.api()[api_name].update(@.id, id, params).done callback
+      api.update(@.id, id, params).done callback
 
     if @.after_update?
       @.after_update()
 
-destroy_fn = (id_param, api_name, name, model, options) ->
+destroy_fn = (id_param, api_name, name, model, connector, options) ->
   (id, callback) =>
     unless callback?
       callback = (data) =>
@@ -108,7 +124,9 @@ destroy_fn = (id_param, api_name, name, model, options) ->
       console.error 'Empty ID. Save parent model first!'
       return
     
+    api = connector.get api_name
+
     if options.belongs_to?
-      @.api()[api_name].destroy(options.belongs_to, @.id, id).done callback
+      api.destroy(options.belongs_to, @.id, id).done callback
     else
-      @.api()[api_name].destroy(@.id, id).done callback
+      api.destroy(@.id, id).done callback
