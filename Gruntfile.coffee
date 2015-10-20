@@ -45,6 +45,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-jasmine'
   grunt.loadNpmTasks 'grunt-contrib-watch'
+  grunt.loadNpmTasks 'grunt-browserify'
 
   grunt.registerTask 'default', ['coffee', 'uglify', 'jasmine']
   grunt.registerTask 'test', ['jasmine']
