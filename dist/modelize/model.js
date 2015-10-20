@@ -1,26 +1,28 @@
-'use strict';
 var Modelize,
   indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 Modelize = function(options) {
-  var mapi, model;
-  if (api[options.api] == null) {
-    api.add(options.api);
+  'use strict';
+  var connector, model;
+  if (options.connector == null) {
+    console.error('No connector given for api: ' + options.api);
+    return;
   }
-  mapi = api[options.api];
+  options.connector.init(options.api);
   if (options.has_one != null) {
-    add_apis_to(options.has_one, options.api);
+    options.connector.add_apis_to(options.has_one, options.api);
   }
   if (options.has_many != null) {
-    add_apis_to(options.has_many, options.api);
+    options.connector.add_apis_to(options.has_many, options.api);
   }
+  connector = options.connector.get(options.api);
   model = function(self) {
     var data, fn, i, index, item, items, len, name, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, relation_params;
     if (self == null) {
       self = {};
     }
     self.api = function() {
-      return mapi;
+      return connector;
     };
     if (options.encrypted_container != null) {
       Encryptable(self, options.encrypted_container, options.encrypted_editable);
@@ -46,7 +48,7 @@ Modelize = function(options) {
         Ham.merge(data, {
           model: name.capitalize()
         });
-        relation_params = relationship_fields(name, data.model, options);
+        relation_params = relationship_fields(name, data.model, options.connector, options);
         fn = window[data.model];
         if (typeof self[name + '_id'] !== 'function' && indexOf.call(options.belongs_to, name) < 0) {
           if (options.editable == null) {
@@ -69,7 +71,7 @@ Modelize = function(options) {
         Ham.merge(data, {
           model: name.capitalize()
         });
-        relation_params = relationship_fields(name, data.model, options);
+        relation_params = relationship_fields(name, data.model, options.connector, options);
         if (self[name + 's'] != null) {
           fn = window[data.model];
           items = [];
@@ -157,7 +159,7 @@ Modelize = function(options) {
     })(this);
     self.create = (function(_this) {
       return function(callback) {
-        return mapi.create(self["export"]()).done(function(data) {
+        return self.api().create(self["export"]()).done(function(data) {
           self.id = data.id;
           if (options.encrypted_container != null) {
             self.enc_update(data);
@@ -167,9 +169,15 @@ Modelize = function(options) {
       };
     })(this);
     self["export"] = (function(_this) {
-      return function() {
+      return function(id) {
         var has_data, ref10, ref11, ref12;
+        if (id == null) {
+          id = false;
+        }
         data = {};
+        if (id === true) {
+          data['id'] = self['id'];
+        }
         if (options.editable != null) {
           ref10 = options.editable;
           for (index in ref10) {
@@ -226,12 +234,13 @@ Modelize = function(options) {
       return;
     }
     if ((params != null) && (params.id != null)) {
-      return mapi.read(params.id, params).done(callback);
+      return connector.read(params.id, params).done(callback);
     } else {
-      return mapi.read(params).done(callback);
+      console.log(connector);
+      return connector.read(params).done(callback);
     }
   };
-  model.getOne = function(id, observable) {
+  model.get_one = function(id, observable) {
     return model.get({
       id: id
     }, observable);
@@ -264,9 +273,9 @@ Modelize = function(options) {
       if (model.encrypted_container != null) {
         params = model.encrypt_container(params);
       }
-      return mapi.create(params).done(callback);
+      return connector.create(params).done(callback);
     } else {
-      return mapi.create().done(callback);
+      return connector.create().done(callback);
     }
   };
   if (options.encrypted_container != null) {
@@ -290,5 +299,9 @@ Modelize = function(options) {
   };
   return model;
 };
+
+if (typeof module !== "undefined" && module !== null) {
+  module.exports = Modelize;
+}
 
 //# sourceMappingURL=model.js.map

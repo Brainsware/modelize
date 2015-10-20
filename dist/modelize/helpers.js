@@ -1,19 +1,19 @@
 var create_fn, destroy_fn, get_fn, lazy_get_fn, lazy_single_get_fn, relationship_fields, single_get_fn, update_fn;
 
-relationship_fields = function(name, model, options) {
+relationship_fields = function(name, model, connector, options) {
   if (options == null) {
     options = {};
   }
-  return [name + '_id', name + 's', name, window[model], options];
+  return [name + '_id', name + 's', name, window[model], connector, options];
 };
 
-get_fn = function(id_param, api_name, name, model, options) {
+get_fn = function(id_param, api_name, name, model, connector, options) {
   if (options == null) {
     options = {};
   }
   return (function(_this) {
     return function(params, callbackOrObservable) {
-      var callback;
+      var api, callback;
       if (params == null) {
         params = {};
       }
@@ -33,16 +33,21 @@ get_fn = function(id_param, api_name, name, model, options) {
         }
         callback = callbackOrObservable;
       }
+      api = connector.get(api_name);
+      if (api == null) {
+        console.error('No Connector found for resource "' + api_name + '" found: ', api);
+        return false;
+      }
       if (options.belongs_to != null) {
-        return _this.api()[api_name].read(options.belongs_to, _this.id, params).done(callback);
+        return api.read(options.belongs_to, _this.id, params).done(callback);
       } else {
-        return _this.api()[api_name].read(_this.id, params).done(callback);
+        return api.read(_this.id, params).done(callback);
       }
     };
   })(this);
 };
 
-single_get_fn = function(id_param, api_name, name, model, options) {
+single_get_fn = function(id_param, api_name, name, model, connector, options) {
   if (options == null) {
     options = {};
   }
@@ -63,13 +68,13 @@ single_get_fn = function(id_param, api_name, name, model, options) {
       
         callback = callbackOrObservable
        */
-      return model.getOne(_this[id_param](), callback);
+      return model.get_one(_this[id_param](), callback);
     };
   })(this);
 };
 
-lazy_get_fn = function(id_param, api_name, name, model, options) {
-  var callback;
+lazy_get_fn = function(id_param, api_name, name, model, connector, options) {
+  var api, callback;
   if (typeof callback === "undefined" || callback === null) {
     callback = (function(_this) {
       return function(data) {
@@ -82,11 +87,12 @@ lazy_get_fn = function(id_param, api_name, name, model, options) {
         return _this[api_name](res);
       };
     })(this);
-    return this.api()[api_name].read(this.id).done(callback);
+    api = connector.get(api_name);
+    return api.read(this.id).done(callback);
   }
 };
 
-lazy_single_get_fn = function(id_param, api_name, name, model, options) {
+lazy_single_get_fn = function(id_param, api_name, name, model, connector, options) {
   var callback;
   if (typeof this[id_param] !== 'function') {
     console.error('External key not an observable: ' + id_param);
@@ -107,12 +113,13 @@ lazy_single_get_fn = function(id_param, api_name, name, model, options) {
       };
     })(this);
   }
-  return model.getOne(this[id_param](), callback);
+  return model.get_one(this[id_param](), callback);
 };
 
-create_fn = function(id_param, api_name, name, model, options) {
+create_fn = function(id_param, api_name, name, model, connector, options) {
   return (function(_this) {
     return function(params, callback, instant) {
+      var api;
       if (params == null) {
         params = {};
       }
@@ -131,18 +138,20 @@ create_fn = function(id_param, api_name, name, model, options) {
       if (model.encrypted_container != null) {
         params = model.encrypt_container(params);
       }
+      api = connector.get(api_name);
       if (options.belongs_to.length > 0) {
-        return _this.api()[api_name].create(options.belongs_to, _this.id, params).done(callback);
+        return api.create(options.belongs_to, _this.id, params).done(callback);
       } else {
-        return _this.api()[api_name].create(_this.id, params).done(callback);
+        return api.create(_this.id, params).done(callback);
       }
     };
   })(this);
 };
 
-update_fn = function(id_param, api_name, name, model, options) {
+update_fn = function(id_param, api_name, name, model, connector, options) {
   return (function(_this) {
     return function(id, params, callback) {
+      var api;
       if (_this.id == null) {
         console.error('Empty ID. Save parent model first!');
         return;
@@ -150,10 +159,11 @@ update_fn = function(id_param, api_name, name, model, options) {
       if (model.encrypted_container != null) {
         params = model.encrypt_container(params);
       }
+      api = connector.get(api_name);
       if (options.belongs_to != null) {
-        _this.api()[api_name].update(options.belongs_to, _this.id, id, params).done(callback);
+        api.update(options.belongs_to, _this.id, id, params).done(callback);
       } else {
-        _this.api()[api_name].update(_this.id, id, params).done(callback);
+        api.update(_this.id, id, params).done(callback);
       }
       if (_this.after_update != null) {
         return _this.after_update();
@@ -162,9 +172,10 @@ update_fn = function(id_param, api_name, name, model, options) {
   })(this);
 };
 
-destroy_fn = function(id_param, api_name, name, model, options) {
+destroy_fn = function(id_param, api_name, name, model, connector, options) {
   return (function(_this) {
     return function(id, callback) {
+      var api;
       if (callback == null) {
         callback = function(data) {
           return _this[api_name].remove(element);
@@ -174,10 +185,11 @@ destroy_fn = function(id_param, api_name, name, model, options) {
         console.error('Empty ID. Save parent model first!');
         return;
       }
+      api = connector.get(api_name);
       if (options.belongs_to != null) {
-        return _this.api()[api_name].destroy(options.belongs_to, _this.id, id).done(callback);
+        return api.destroy(options.belongs_to, _this.id, id).done(callback);
       } else {
-        return _this.api()[api_name].destroy(_this.id, id).done(callback);
+        return api.destroy(_this.id, id).done(callback);
       }
     };
   })(this);

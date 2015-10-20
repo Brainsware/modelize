@@ -1,18 +1,8 @@
-var add_apis_to, api, api_key, api_user;
-
-if (typeof api_user === "undefined" || api_user === null) {
-  api_user = '';
-}
-
-if (typeof api_key === "undefined" || api_key === null) {
-  api_key = '';
-}
+var add_apis_to, api;
 
 api = new $.RestClient('/api/', {
   stripTrailingSlash: true,
-  methodOverride: true,
-  username: api_user,
-  password: api_key
+  methodOverride: true
 });
 
 add_apis_to = function(sub_apis, main_api) {

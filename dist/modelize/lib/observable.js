@@ -1,8 +1,4 @@
-var Computed, ComputedArray, LazyObservable, LazyObservableArray, Observable, ObservableArray, PureComputed, ko;
-
-if (typeof require !== "undefined" && require !== null) {
-  ko = require('../../../knockout/build/output/knockout-latest.debug');
-}
+var Computed, ComputedArray, LazyObservable, LazyObservableArray, Observable, ObservableArray, PureComputed;
 
 Observable = function(self, property, initial_value) {
   if (initial_value === void 0) {
