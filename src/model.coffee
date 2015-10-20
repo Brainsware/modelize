@@ -1,17 +1,22 @@
-'use strict'
-
 # The modelize main function
 # Returns a modelize object
 #
 # @param [Object] options The main configuration object for modelize
 #
 Modelize = (options) ->
-  api.add options.api unless api[options.api]?
-  mapi = api[options.api]
-  
-  add_apis_to options.has_one, options.api if options.has_one?
+  'use strict'
 
-  add_apis_to options.has_many, options.api if options.has_many?
+  unless options.connector?
+    console.error 'No connector given for api: ' + options.api
+    return
+
+  options.connector.init options.api
+
+  options.connector.add_apis_to options.has_one, options.api if options.has_one?
+  
+  options.connector.add_apis_to options.has_many, options.api if options.has_many?
+
+  connector = options.connector.get options.api
 
   # Provide the constructor function for the model object.
   # Enriches the optionally provided object with model functions.
@@ -21,7 +26,7 @@ Modelize = (options) ->
   model = (self = {}) ->
     # Return api object
     #
-    self.api = -> mapi
+    self.api = -> connector
 
     # Check if de/encryption functions should be included
     #
@@ -60,7 +65,7 @@ Modelize = (options) ->
         Ham.merge data,
           model: name.capitalize()
 
-        relation_params = relationship_fields name, data.model, options
+        relation_params = relationship_fields name, data.model, options.connector, options
 
         fn = window[data.model]
         
@@ -74,7 +79,8 @@ Modelize = (options) ->
         if self[name]?
           Observable self, name, new fn(self[name])
         else
-          LazyObservable self, name, lazy_single_get_fn, relation_params
+          Observable self, name, new fn()
+          #LazyObservable self, name, lazy_single_get_fn, relation_params
 
         self[name + '_get'] = single_get_fn.apply self, relation_params
 
@@ -99,7 +105,7 @@ Modelize = (options) ->
         Ham.merge data,
           model: name.capitalize()
         
-        relation_params = relationship_fields name, data.model, options
+        relation_params = relationship_fields name, data.model, options.connector, options
 
         # Get
         #
@@ -112,7 +118,8 @@ Modelize = (options) ->
 
           ObservableArray self, name + 's', items
         else
-          LazyObservableArray self, name + 's', lazy_get_fn, relation_params
+          ObservableArray self, name + 's', []
+          #LazyObservableArray self, name + 's', lazy_get_fn, relation_params
         self[name + '_get'] = get_fn.apply self, relation_params
 
         # Create
@@ -184,7 +191,7 @@ Modelize = (options) ->
     # Save nonexisting instance of self against API and set self.id
     #
     self.create = (callback) =>
-      mapi.create(self.export()).done (data) =>
+      self.api().create(self.export()).done (data) =>
         self.id = data.id
 
         if options.encrypted_container?
@@ -194,8 +201,12 @@ Modelize = (options) ->
 
     # Export all model data as an array
     #
-    self.export = =>
+    self.export = (id = false) =>
       data = {}
+
+      if id == true
+        data['id'] = self['id']
+
       if options.editable?
         for index, name of options.editable
           data[name] = self[name]()
@@ -235,13 +246,14 @@ Modelize = (options) ->
       return
 
     if params? && params.id?
-      mapi.read(params.id, params).done callback
+      connector.read(params.id, params).done callback
     else
-      mapi.read(params).done callback
+      console.log connector
+      connector.read(params).done callback
 
   # Shorthand for model.get, just provide a single ID
   #
-  model.getOne = (id, observable) ->
+  model.get_one = (id, observable) ->
     model.get { id: id }, observable
 
   # Create new object with given params
@@ -268,9 +280,9 @@ Modelize = (options) ->
       if model.encrypted_container?
         params = model.encrypt_container(params)
       
-      mapi.create(params).done callback
+      connector.create(params).done callback
     else
-      mapi.create().done callback
+      connector.create().done callback
 
   if options.encrypted_container?
     model.encrypted_container = options.encrypted_container
@@ -291,3 +303,6 @@ Modelize = (options) ->
     return data
 
   return model
+
+
+module.exports = Modelize if module?
