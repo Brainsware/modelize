@@ -13,7 +13,7 @@ Modelize = (options) ->
   options.connector.init options.api
 
   options.connector.add_apis_to options.has_one, options.api if options.has_one?
-  
+
   options.connector.add_apis_to options.has_many, options.api if options.has_many?
 
   connector = options.connector.get options.api
@@ -36,11 +36,11 @@ Modelize = (options) ->
     # Include sortable functions
     if options.sortable? && options.sortable == true
       Sortable self
-    
+
     # Include selectable functions
     if options.selectable? && options.selectable == true
       Selectable self
-    
+
     # Set relations
     # API wise has_one and belongs_to are the same, so we merge them
     #
@@ -65,16 +65,21 @@ Modelize = (options) ->
         Ham.merge data,
           model: name.capitalize()
 
-        relation_params = relationship_fields name, data.model, options.connector, options
+        relation_params = relationship_fields name, data.model, self.api(), options
 
         fn = window[data.model]
-        
+
+        if typeof fn != 'function'
+          console.error 'No model for has_one/belongs_to relation found'
+          continue
+
         if typeof self[name + '_id'] != 'function' && name not in options.belongs_to
           unless options.editable?
             options.editable = []
 
           options.editable.push name + '_id'
-        
+          console.log self[name + 'id']
+
 
         if self[name]?
           Observable self, name, new fn(self[name])
@@ -104,14 +109,14 @@ Modelize = (options) ->
       for name, data of options.has_many
         Ham.merge data,
           model: name.capitalize()
-        
-        relation_params = relationship_fields name, data.model, options.connector, options
+
+        relation_params = relationship_fields name, data.model, self.api(), options
 
         # Get
         #
         if self[name + 's']?
           fn = window[data.model]
-          
+
           items = []
           for item in self[name + 's']
             items.push new fn(item)
@@ -217,7 +222,7 @@ Modelize = (options) ->
 
       if options.belongs_to?
         for name, has_data of options.belongs_to
-          data[name + '_id'] = self[name + '_id']
+          data[name + '_id'] = self[name + '_id']()
 
       return data
 
@@ -248,20 +253,21 @@ Modelize = (options) ->
     if params? && params.id?
       connector.read(params.id, params).done callback
     else
-      console.log connector
       connector.read(params).done callback
+
+    return
 
   # Shorthand for model.get, just provide a single ID
   #
-  model.get_one = (id, observable) ->
-    model.get { id: id }, observable
+  model.get_one = (id, callbackOrObservable) ->
+    model.get { id: id }, callbackOrObservable
 
   # Create new object with given params
   #
   model.create = (params = {}, callbackOrObservable) ->
     callback = (data) ->
       callbackOrObservable.push model(data)
-    
+
     if typeof callbackOrObservable['push'] == 'undefined'
       if typeof callbackOrObservable != 'function'
         console.log 'model.create 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven:'
@@ -273,22 +279,22 @@ Modelize = (options) ->
 
         if m.after_create?
           m.after_create()
-        
+
         callbackOrObservable(data)
 
     if params.length > 0 || typeof params == 'object'
       if model.encrypted_container?
         params = model.encrypt_container(params)
-      
+
       connector.create(params).done callback
     else
       connector.create().done callback
 
-  if options.encrypted_container?
-    model.encrypted_container = options.encrypted_container
+    return
 
-  if options.encrypted_editable?
-    model.encrypted_editable = options.encrypted_editable
+  model.encrypted_container = options.encrypted_container if options.encrypted_container?
+
+  model.encrypted_editable = options.encrypted_editable if options.encrypted_editable?
 
   # Debug function
   model.encrypt_container = (data, container) ->
