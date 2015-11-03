@@ -1,16 +1,18 @@
 {
   "name": "modelize",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "main": "dist/modelize.min.js",
-  "description": "REST model interface for KnockoutJS",
+  "description": "Knockout.js REST and encryptable models",
   "homepage": "http://brainsware.org",
   "author": "Daniel Khalil <d.khalil@brainsware.org>",
   "keywords": [
     "knockout",
     "knockoutjs",
     "model",
-    "models",
     "rest",
+    "sjcl",
+    "encryption",
+    "encryptable",
     "modelize"
   ],
   "dependencies": {
@@ -20,12 +22,14 @@
     "jquery.rest": "*"
   },
   "devDependencies": {
-    "jasmine-core": "2.*"
+    "jasmine-core": "2.*",
+    "jasmine-ajax": "3.*"
   },
   "ignore": [
     "**/.*",
     "node_modules",
     "bower_components",
+    "spec", "spec_src",
     "Gruntfile.coffee"
   ]
 }
