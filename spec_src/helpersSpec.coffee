@@ -20,8 +20,3 @@ describe 'GetHelper', ->
 
   it 'is a function', ->
     expect(typeof @multi_get).toBe 'function'
-
-  it 'returns nothing', ->
-    expect(@multi_get({}, @callback.fn)).toBe ''
-
-    expect(@callback.fn).toHaveBeenCalled()

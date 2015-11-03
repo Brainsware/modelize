@@ -20,11 +20,7 @@ describe('GetHelper', function() {
     };
     return spyOn(this.callback, 'fn');
   });
-  it('is a function', function() {
+  return it('is a function', function() {
     return expect(typeof this.multi_get).toBe('function');
-  });
-  return it('returns nothing', function() {
-    expect(this.multi_get({}, this.callback.fn)).toBe('');
-    return expect(this.callback.fn).toHaveBeenCalled();
   });
 });
