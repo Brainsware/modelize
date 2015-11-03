@@ -1,5 +1,5 @@
-if require?
-  ko = require '../../../knockout/build/output/knockout-latest.debug'
+#if require?
+#  ko = require '../../../knockout/build/output/knockout-latest.debug'
 
 Observable = (self, property, initial_value) ->
   initial_value = self[property] if initial_value == undefined
@@ -47,6 +47,7 @@ LazyObservable = (self, property, callback, params = [], init_value = null, make
   self[property] = ko.computed
     read: ->
       if self[property].loaded() == false
+        console.debug 'LazyLoading property', property
         callback.apply(self, params)
       return _value()
     write: (newValue) ->
@@ -66,7 +67,7 @@ LazyObservable = (self, property, callback, params = [], init_value = null, make
   self[property].loaded = ko.observable false
   #load it again
   self[property].refresh = ->
-    result.loaded(false)
+    self[property].loaded(false)
 
 LazyObservableArray = (self, property, callback, params = [], init_value = null) ->
   LazyObservable self, property, callback, params, init_value, true
