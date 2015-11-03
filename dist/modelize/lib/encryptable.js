@@ -38,7 +38,7 @@ Encryptable = function(self, encrypted_container, encrypted_editable) {
           self[encrypted_container][index] = value;
         }
       }
-      self.save_encrypted_encrypted_container();
+      self.save_encrypted_container();
       if (callback != null) {
         return callback();
       }

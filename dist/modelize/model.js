@@ -48,13 +48,18 @@ Modelize = function(options) {
         Ham.merge(data, {
           model: name.capitalize()
         });
-        relation_params = relationship_fields(name, data.model, options.connector, options);
+        relation_params = relationship_fields(name, data.model, self.api(), options);
         fn = window[data.model];
+        if (typeof fn !== 'function') {
+          console.error('No model for has_one/belongs_to relation found');
+          continue;
+        }
         if (typeof self[name + '_id'] !== 'function' && indexOf.call(options.belongs_to, name) < 0) {
           if (options.editable == null) {
             options.editable = [];
           }
           options.editable.push(name + '_id');
+          console.log(self[name + 'id']);
         }
         if (self[name] != null) {
           Observable(self, name, new fn(self[name]));
@@ -71,7 +76,7 @@ Modelize = function(options) {
         Ham.merge(data, {
           model: name.capitalize()
         });
-        relation_params = relationship_fields(name, data.model, options.connector, options);
+        relation_params = relationship_fields(name, data.model, self.api(), options);
         if (self[name + 's'] != null) {
           fn = window[data.model];
           items = [];
@@ -196,7 +201,7 @@ Modelize = function(options) {
           ref12 = options.belongs_to;
           for (name in ref12) {
             has_data = ref12[name];
-            data[name + '_id'] = self[name + '_id'];
+            data[name + '_id'] = self[name + '_id']();
           }
         }
         return data;
@@ -234,16 +239,15 @@ Modelize = function(options) {
       return;
     }
     if ((params != null) && (params.id != null)) {
-      return connector.read(params.id, params).done(callback);
+      connector.read(params.id, params).done(callback);
     } else {
-      console.log(connector);
-      return connector.read(params).done(callback);
+      connector.read(params).done(callback);
     }
   };
-  model.get_one = function(id, observable) {
+  model.get_one = function(id, callbackOrObservable) {
     return model.get({
       id: id
-    }, observable);
+    }, callbackOrObservable);
   };
   model.create = function(params, callbackOrObservable) {
     var callback;
@@ -273,9 +277,9 @@ Modelize = function(options) {
       if (model.encrypted_container != null) {
         params = model.encrypt_container(params);
       }
-      return connector.create(params).done(callback);
+      connector.create(params).done(callback);
     } else {
-      return connector.create().done(callback);
+      connector.create().done(callback);
     }
   };
   if (options.encrypted_container != null) {
