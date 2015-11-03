@@ -6,7 +6,7 @@ Encryptable = (self, encrypted_container, encrypted_editable) ->
       dencdata = decryptData sessionStorage.getItem('appKey'), encrypted_container
 
       encrypted_container = JSON.parse(dencdata)
-      
+
       for index, value of encrypted_container
         self[index] = value
 
@@ -25,11 +25,11 @@ Encryptable = (self, encrypted_container, encrypted_editable) ->
 
         self[encrypted_container][index] = value
 
-    self.save_encrypted_encrypted_container()
-    
+    self.save_encrypted_container()
+
     if callback?
       callback()
-  
+
   self.save_encrypted_container = =>
     encdata = encryptData(sessionStorage.getItem('appKey'), JSON.stringify(self[encrypted_container]))
 
