@@ -2,11 +2,7 @@ Editable = (self, property, callback) ->
   editing_property = 'editing_' + property
 
   Observable self, property
-  
-  if typeof self[property] != 'function'
-    console.error 'Editable field "' + property + '" is not a valid Observable'
-    return false
-  
+
   # Editing states:
   # -1: error
   # 0: default
@@ -39,7 +35,7 @@ DelayedSave = (options, self) ->
       , delay)
 
 EncryptedDelayedSave = (options, self) ->
-  (value, prop, delay = 250) =>      
+  (value, prop, delay = 250) =>
     if typeof self[options.encrypted_container] != 'object' || self[options.encrypted_container] == null
       self[options.encrypted_container] = {}
 
