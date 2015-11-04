@@ -7,43 +7,6 @@ relationship_fields = function(name, model, connector, options) {
   return [name + '_id', name + 's', name, window[model], connector, options];
 };
 
-get_fn = function(id_param, api_name, name, model, api, options) {
-  if (options == null) {
-    options = {};
-  }
-  return (function(_this) {
-    return function(params, callbackOrObservable) {
-      var callback;
-      if (params == null) {
-        params = {};
-      }
-      callback = function(data) {
-        var i, len, m, res;
-        res = [];
-        for (i = 0, len = data.length; i < len; i++) {
-          m = data[i];
-          res.push(model(m));
-        }
-        return _this[api_name](res);
-      };
-      if (typeof callbackOrObservable['push'] === 'undefined') {
-        if (typeof callbackOrObservable !== 'function') {
-          throw new Error('model.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable);
-        }
-        callback = callbackOrObservable;
-      }
-      if (api == null) {
-        throw new Error('No Connector found for resource "' + api_name + '" found: ', api);
-      }
-      if ((options.belongs_to != null) && options.belongs_to.length > 0) {
-        return api[api_name].read(options.belongs_to, _this.id, params).done(callback);
-      } else {
-        return api[api_name].read(_this.id, params).done(callback);
-      }
-    };
-  })(this);
-};
-
 single_get_fn = function(id_param, api_name, name, model, api, options) {
   if (options == null) {
     options = {};
@@ -99,22 +62,50 @@ lazy_single_get_fn = function(id_param, api_name, name, model, api, options) {
   }
   if (typeof callback === "undefined" || callback === null) {
     callback = (function(_this) {
-      return function(data) {
-        return _this[name](model(data));
-      };
+      return function(data) {};
     })(this);
+    this[name](model(data));
   }
   return model.get_one(this[id_param](), callback);
 };
 
-create_fn = function(id_param, api_name, name, model, api, options) {
+get_fn = function(id_param, api_name, name, model, api, options) {
+  if (options == null) {
+    options = {};
+  }
   return (function(_this) {
-    return function(params, callback, instant) {
+    return function(params, callback) {
       if (params == null) {
         params = {};
       }
-      if (instant == null) {
-        instant = false;
+      if (callback == null) {
+        callback = function(data) {
+          var i, len, m, res;
+          res = [];
+          for (i = 0, len = data.length; i < len; i++) {
+            m = data[i];
+            res.push(model(m));
+          }
+          return _this[api_name](res);
+        };
+      }
+      if (api == null) {
+        throw new Error('No Connector found for resource "' + api_name + '" found: ', api);
+      }
+      if ((options.belongs_to != null) && options.belongs_to.length > 0) {
+        return api[api_name].read(options.belongs_to, _this.id, params).done(callback);
+      } else {
+        return api[api_name].read(_this.id, params).done(callback);
+      }
+    };
+  })(this);
+};
+
+create_fn = function(id_param, api_name, name, model, api, options) {
+  return (function(_this) {
+    return function(params, callback) {
+      if (params == null) {
+        params = {};
       }
       if (callback == null) {
         callback = function(data) {

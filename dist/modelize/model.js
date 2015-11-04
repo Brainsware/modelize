@@ -52,11 +52,13 @@ Modelize = function(options) {
         if (typeof fn !== 'function') {
           throw new Error('No model for has_one/belongs_to relation found');
         }
-        if (typeof self[name + '_id'] !== 'function' && indexOf.call(options.belongs_to, name) < 0 && (ref1 = name + '_id', indexOf.call(options.editable, ref1) < 0)) {
+        if (typeof self[name + '_id'] !== 'function' && indexOf.call(options.belongs_to, name) < 0) {
           if (options.editable == null) {
             options.editable = [];
           }
-          options.editable.push(name + '_id');
+          if (ref1 = name + '_id', indexOf.call(options.editable, ref1) < 0) {
+            options.editable.push(name + '_id');
+          }
         }
         if (self[name] != null) {
           Observable(self, name, new fn(self[name]));
@@ -100,7 +102,6 @@ Modelize = function(options) {
       }
     }
     if (options.editable != null) {
-      console.log(options.editable);
       ref5 = options.editable;
       for (index in ref5) {
         name = ref5[index];
