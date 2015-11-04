@@ -4,6 +4,7 @@
   "main": "dist/modelize.min.js",
   "description": "Knockout.js REST and encryptable models",
   "homepage": "http://brainsware.org",
+  "license": "MIT",
   "author": "Daniel Khalil <d.khalil@brainsware.org>",
   "license": "MIT",
   "keywords": [
