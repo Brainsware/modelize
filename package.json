@@ -1,10 +1,14 @@
 {
   "name": "modelize",
   "title": "modelize",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "license": "MIT",
   "description": "REST model interface for KnockoutJS",
   "homepage": "http://brainsware.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Brainsware/modelize"
+  },
   "author": {
     "name": "Daniel Khalil",
     "email": "d.khalil@brainsware.org",
