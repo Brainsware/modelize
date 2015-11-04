@@ -71,11 +71,12 @@ Modelize = (options) ->
         if typeof fn != 'function'
           throw new Error 'No model for has_one/belongs_to relation found'
 
-        if typeof self[name + '_id'] != 'function' && name not in options.belongs_to && name + '_id' not in options.editable
+        if typeof self[name + '_id'] != 'function' && name not in options.belongs_to
           unless options.editable?
             options.editable = []
 
-          options.editable.push name + '_id'
+          if name + '_id' not in options.editable
+            options.editable.push name + '_id'
 
         if self[name]?
           Observable self, name, new fn(self[name])
@@ -144,7 +145,6 @@ Modelize = (options) ->
     # Set editable fields
     #
     if options.editable?
-      console.log options.editable
       for index, name of options.editable
         Editable self, name, DelayedSave.apply(self, [options, self])
 
