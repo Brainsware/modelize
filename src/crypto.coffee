@@ -2,8 +2,7 @@
 #
 generateKey = (password, salt) ->
   if password == ''
-    console.error 'Password for key generation empty!'
-    return false
+    throw new Error 'Password for key generation empty!'
 
   hex = sjcl.codec.hex.fromBits
 
@@ -24,7 +23,7 @@ generateKey = (password, salt) ->
 #
 generateSalt = (length = 2) ->
   rand = sjcl.random.randomWords length
-  
+
   return sjcl.codec.hex.fromBits rand
 
 # Encrypt data with key
@@ -32,8 +31,7 @@ generateSalt = (length = 2) ->
 #
 encryptData = (key, data, adata = '') ->
   if key == ''
-    console.error 'Encryption key empty!'
-    return false
+    throw new Error 'Encryption key empty!'
 
   options =
     mode : 'gcm'
@@ -50,8 +48,7 @@ encryptData = (key, data, adata = '') ->
 #
 decryptData = (key, data) ->
   if key == ''
-    console.error 'Decryption key empty!'
-    return false
+    throw new Error 'Decryption key empty!'
 
   options_ret = {}
 
