@@ -1,3 +1,6 @@
+![Travis Build](https://img.shields.io/travis/Brainsware/modelize/master.svg)  
+![Bower Release](https://img.shields.io/bower/v/modelize.svg) ![Bower License](https://img.shields.io/bower/l/modelize.svg)
+
 Modelize
 ========
 
