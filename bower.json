@@ -5,6 +5,7 @@
   "description": "Knockout.js REST and encryptable models",
   "homepage": "http://brainsware.org",
   "author": "Daniel Khalil <d.khalil@brainsware.org>",
+  "license": "MIT",
   "keywords": [
     "knockout",
     "knockoutjs",
