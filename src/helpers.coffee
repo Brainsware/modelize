@@ -3,28 +3,6 @@
 #
 relationship_fields = (name, model, connector, options = {}) -> [name + '_id', name + 's', name, window[model], connector, options]
 
-get_fn = (id_param, api_name, name, model, api, options = {}) ->
-  (params = {}, callbackOrObservable) =>
-    callback = (data) =>
-      res = []
-      for m in data
-        res.push model(m)
-      @[api_name] res
-
-    if typeof callbackOrObservable['push'] == 'undefined'
-      if typeof callbackOrObservable != 'function'
-        throw new Error 'model.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable
-
-      callback = callbackOrObservable
-
-    unless api?
-      throw new Error 'No Connector found for resource "' + api_name + '" found: ', api
-
-    if options.belongs_to? && options.belongs_to.length > 0
-      api[api_name].read(options.belongs_to, @.id, params).done callback
-    else
-      api[api_name].read(@.id, params).done callback
-
 single_get_fn = (id_param, api_name, name, model, api, options = {}) ->
   (params = {}, callbackOrObservable) =>
     callback = (data) =>
@@ -59,13 +37,30 @@ lazy_single_get_fn = (id_param, api_name, name, model, api, options) ->
     throw new Error 'Circular referene? Quitting.'
 
   unless callback?
-    callback = (data) =>
+      callback = (data) =>
       @[name] model(data)
 
   model.get_one @[id_param](), callback
 
+get_fn = (id_param, api_name, name, model, api, options = {}) ->
+  (params = {}, callback) =>
+    unless callback?
+      callback = (data) =>
+        res = []
+        for m in data
+          res.push model(m)
+        @[api_name] res
+
+    unless api?
+      throw new Error 'No Connector found for resource "' + api_name + '" found: ', api
+
+    if options.belongs_to? && options.belongs_to.length > 0
+      api[api_name].read(options.belongs_to, @.id, params).done callback
+    else
+      api[api_name].read(@.id, params).done callback
+
 create_fn = (id_param, api_name, name, model, api, options) ->
-  (params = {}, callback, instant = false) =>
+  (params = {}, callback) =>
     unless callback?
       callback = (data) =>
         @[api_name].push model(data)
