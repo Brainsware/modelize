@@ -4,10 +4,6 @@ Editable = function(self, property, callback) {
   var editing_property;
   editing_property = 'editing_' + property;
   Observable(self, property);
-  if (typeof self[property] !== 'function') {
-    console.error('Editable field "' + property + '" is not a valid Observable');
-    return false;
-  }
   Observable(self, editing_property, 0);
   self[property].subscribe((function(_this) {
     return function(new_value) {

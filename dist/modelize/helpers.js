@@ -28,14 +28,12 @@ get_fn = function(id_param, api_name, name, model, api, options) {
       };
       if (typeof callbackOrObservable['push'] === 'undefined') {
         if (typeof callbackOrObservable !== 'function') {
-          console.error('Collection.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven:');
-          console.error(callbackOrObservable);
+          throw new Error('model.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable);
         }
         callback = callbackOrObservable;
       }
       if (api == null) {
-        console.error('No Connector found for resource "' + api_name + '" found: ', api);
-        return false;
+        throw new Error('No Connector found for resource "' + api_name + '" found: ', api);
       }
       if ((options.belongs_to != null) && options.belongs_to.length > 0) {
         return api[api_name].read(options.belongs_to, _this.id, params).done(callback);
@@ -61,8 +59,7 @@ single_get_fn = function(id_param, api_name, name, model, api, options) {
       };
       if (typeof callbackOrObservable['push'] === 'undefined') {
         if (typeof callbackOrObservable !== 'function') {
-          console.error('Collection.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven:');
-          console.error(callbackOrObservable);
+          throw new Error('model.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable);
         }
         callback = callbackOrObservable;
       }
@@ -92,16 +89,13 @@ lazy_get_fn = function(id_param, api_name, name, model, api, options) {
 lazy_single_get_fn = function(id_param, api_name, name, model, api, options) {
   var callback;
   if (typeof this[id_param] !== 'function') {
-    console.error('External key not an observable: ' + id_param);
-    return false;
+    throw new Error('External key not an observable: ' + id_param);
   }
   if (this[id_param]() == null) {
-    console.error('Tried to access empty relation key: ' + id_param);
-    return false;
+    throw new Error('Tried to access empty relation key: ' + id_param);
   }
   if (typeof this[id_param]() === 'function') {
-    console.error('Circular referene? Quitting.');
-    return false;
+    throw new Error('Circular referene? Quitting.');
   }
   if (typeof callback === "undefined" || callback === null) {
     callback = (function(_this) {
@@ -128,15 +122,13 @@ create_fn = function(id_param, api_name, name, model, api, options) {
         };
       }
       if (_this.id == null) {
-        console.error('Empty ID. Save parent model first!');
-        return;
+        throw new Error('Empty ID. Save parent model first!');
       }
       if (model.encrypted_container != null) {
         params = model.encrypt_container(params);
       }
       if (api == null) {
-        console.error('No Connector found for resource "' + api_name + '" found: ', api);
-        return false;
+        throw new Error('No Connector found for resource "' + api_name + '" found: ', api);
       }
       if (options.belongs_to.length > 0) {
         return api[api_name].create(options.belongs_to, _this.id, params).done(callback);
@@ -151,8 +143,7 @@ update_fn = function(id_param, api_name, name, model, api, options) {
   return (function(_this) {
     return function(id, params, callback) {
       if (_this.id == null) {
-        console.error('Empty ID. Save parent model first!');
-        return;
+        throw new Error('Empty ID. Save parent model first!');
       }
       if (model.encrypted_container != null) {
         params = model.encrypt_container(params);
@@ -178,8 +169,7 @@ destroy_fn = function(id_param, api_name, name, model, api, options) {
         };
       }
       if (_this.id == null) {
-        console.error('Empty ID. Save parent model first!');
-        return;
+        throw new Error('Empty ID. Save parent model first!');
       }
       api = connector.get(api_name);
       if (options.belongs_to != null) {

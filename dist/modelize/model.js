@@ -5,8 +5,7 @@ Modelize = function(options) {
   'use strict';
   var connector, model;
   if (options.connector == null) {
-    console.error('No connector given for api: ' + options.api);
-    return;
+    throw new Error('No connector given for api: ' + options.api);
   }
   options.connector.init(options.api);
   if (options.has_one != null) {
@@ -17,7 +16,7 @@ Modelize = function(options) {
   }
   connector = options.connector.get(options.api);
   model = function(self) {
-    var data, fn, i, index, item, items, len, name, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, relation_params;
+    var data, fn, i, index, item, items, len, name, ref, ref1, ref10, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, relation_params;
     if (self == null) {
       self = {};
     }
@@ -51,15 +50,13 @@ Modelize = function(options) {
         relation_params = relationship_fields(name, data.model, self.api(), options);
         fn = window[data.model];
         if (typeof fn !== 'function') {
-          console.error('No model for has_one/belongs_to relation found');
-          continue;
+          throw new Error('No model for has_one/belongs_to relation found');
         }
-        if (typeof self[name + '_id'] !== 'function' && indexOf.call(options.belongs_to, name) < 0) {
+        if (typeof self[name + '_id'] !== 'function' && indexOf.call(options.belongs_to, name) < 0 && (ref1 = name + '_id', indexOf.call(options.editable, ref1) < 0)) {
           if (options.editable == null) {
             options.editable = [];
           }
           options.editable.push(name + '_id');
-          console.log(self[name + 'id']);
         }
         if (self[name] != null) {
           Observable(self, name, new fn(self[name]));
@@ -70,9 +67,9 @@ Modelize = function(options) {
       }
     }
     if (options.has_many != null) {
-      ref1 = options.has_many;
-      for (name in ref1) {
-        data = ref1[name];
+      ref2 = options.has_many;
+      for (name in ref2) {
+        data = ref2[name];
         Ham.merge(data, {
           model: name.capitalize()
         });
@@ -80,9 +77,9 @@ Modelize = function(options) {
         if (self[name + 's'] != null) {
           fn = window[data.model];
           items = [];
-          ref2 = self[name + 's'];
-          for (i = 0, len = ref2.length; i < len; i++) {
-            item = ref2[i];
+          ref3 = self[name + 's'];
+          for (i = 0, len = ref3.length; i < len; i++) {
+            item = ref3[i];
             items.push(new fn(item));
           }
           ObservableArray(self, name + 's', items);
@@ -96,59 +93,59 @@ Modelize = function(options) {
       }
     }
     if (options.observable != null) {
-      ref3 = options.observable;
-      for (index in ref3) {
-        name = ref3[index];
+      ref4 = options.observable;
+      for (index in ref4) {
+        name = ref4[index];
         Observable(self, name);
       }
     }
     if (options.editable != null) {
-      ref4 = options.editable;
-      for (index in ref4) {
-        name = ref4[index];
+      console.log(options.editable);
+      ref5 = options.editable;
+      for (index in ref5) {
+        name = ref5[index];
         Editable(self, name, DelayedSave.apply(self, [options, self]));
       }
     }
     if (options.encrypted_editable != null) {
-      ref5 = options.encrypted_editable;
-      for (index in ref5) {
-        name = ref5[index];
+      ref6 = options.encrypted_editable;
+      for (index in ref6) {
+        name = ref6[index];
         Editable(self, name, EncryptedDelayedSave.apply(self, [options, self]));
       }
     }
     if (options.computed != null) {
-      ref6 = options.computed;
-      for (name in ref6) {
-        fn = ref6[name];
+      ref7 = options.computed;
+      for (name in ref7) {
+        fn = ref7[name];
         Computed(self, name, fn);
       }
     }
     if (options.purecomputed != null) {
-      ref7 = options.purecomputed;
-      for (name in ref7) {
-        fn = ref7[name];
+      ref8 = options.purecomputed;
+      for (name in ref8) {
+        fn = ref8[name];
         PureComputed(self, name, fn);
       }
     }
     if (options.computed_array != null) {
-      ref8 = options.computed_array;
-      for (name in ref8) {
-        fn = ref8[name];
+      ref9 = options.computed_array;
+      for (name in ref9) {
+        fn = ref9[name];
         ComputedArray(self, name, fn);
       }
     }
     if (options.functions != null) {
-      ref9 = options.functions;
-      for (name in ref9) {
-        fn = ref9[name];
+      ref10 = options.functions;
+      for (name in ref10) {
+        fn = ref10[name];
         self[name] = fn;
       }
     }
     self.update = (function(_this) {
       return function(params, callback) {
         if (self.id == null) {
-          console.error('Trying to update nonexisting model object');
-          return false;
+          throw new Error('Trying to update nonexisting model object');
         }
         return self.api().update(self.id, params).done(callback);
       };
@@ -156,8 +153,7 @@ Modelize = function(options) {
     self.destroy = (function(_this) {
       return function(callback) {
         if (self.id == null) {
-          console.error('Trying to delete nonexisting model object');
-          return false;
+          throw new Error('Trying to delete nonexisting model object');
         }
         return self.api().destroy(self.id).done(callback);
       };
@@ -175,7 +171,7 @@ Modelize = function(options) {
     })(this);
     self["export"] = (function(_this) {
       return function(id) {
-        var has_data, ref10, ref11, ref12;
+        var has_data, ref11, ref12, ref13;
         if (id == null) {
           id = false;
         }
@@ -184,23 +180,23 @@ Modelize = function(options) {
           data['id'] = self['id'];
         }
         if (options.editable != null) {
-          ref10 = options.editable;
-          for (index in ref10) {
-            name = ref10[index];
-            data[name] = self[name]();
-          }
-        }
-        if (options.encrypted_editable != null) {
-          ref11 = options.encrypted_editable;
+          ref11 = options.editable;
           for (index in ref11) {
             name = ref11[index];
             data[name] = self[name]();
           }
         }
+        if (options.encrypted_editable != null) {
+          ref12 = options.encrypted_editable;
+          for (index in ref12) {
+            name = ref12[index];
+            data[name] = self[name]();
+          }
+        }
         if (options.belongs_to != null) {
-          ref12 = options.belongs_to;
-          for (name in ref12) {
-            has_data = ref12[name];
+          ref13 = options.belongs_to;
+          for (name in ref13) {
+            has_data = ref13[name];
             data[name + '_id'] = self[name + '_id']();
           }
         }
@@ -211,7 +207,7 @@ Modelize = function(options) {
   };
 
   /*
-   * These are the collector functions and are not bound to a specific object but to the model
+   * These are the collection functions and are not bound to a specific object but to the model
    */
   model.get = function(params, callbackOrObservable) {
     var callback;
@@ -229,14 +225,12 @@ Modelize = function(options) {
     };
     if (typeof callbackOrObservable['push'] === 'undefined') {
       if (typeof callbackOrObservable !== 'function') {
-        console.log('model.get 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven:');
-        console.log(callbackOrObservable);
+        throw new Error('Collection.get 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable);
       }
       callback = callbackOrObservable;
     }
     if (typeof params !== 'object') {
-      console.error(params, typeof params);
-      return;
+      throw new Error('Passed params is not an object: ' + typeof params);
     }
     if ((params != null) && (params.id != null)) {
       connector.read(params.id, params).done(callback);
@@ -245,6 +239,16 @@ Modelize = function(options) {
     }
   };
   model.get_one = function(id, callbackOrObservable) {
+    var callback;
+    callback = function(data) {
+      return callbackOrObservable(model(data));
+    };
+    if (ko.isObservable(callbackOrObservable) === false) {
+      if (typeof callbackOrObservable !== 'function') {
+        throw new Error('Collection.get_one 2nd parameter needs to be either a function or an Observable.\nGiven: ' + callbackOrObservable);
+      }
+      callback = callbackOrObservable;
+    }
     return model.get({
       id: id
     }, callbackOrObservable);
@@ -259,8 +263,7 @@ Modelize = function(options) {
     };
     if (typeof callbackOrObservable['push'] === 'undefined') {
       if (typeof callbackOrObservable !== 'function') {
-        console.log('model.create 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven:');
-        console.log(callbackOrObservable);
+        throw new Error('Collection.create 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable);
       }
       callback = (function(_this) {
         return function(data) {

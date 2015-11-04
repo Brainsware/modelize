@@ -3,8 +3,7 @@ var decryptData, encryptData, generateKey, generateSalt, getHash;
 generateKey = function(password, salt) {
   var hex, options;
   if (password === '') {
-    console.error('Password for key generation empty!');
-    return false;
+    throw new Error('Password for key generation empty!');
   }
   hex = sjcl.codec.hex.fromBits;
   if (salt == null) {
@@ -33,8 +32,7 @@ encryptData = function(key, data, adata) {
     adata = '';
   }
   if (key === '') {
-    console.error('Encryption key empty!');
-    return false;
+    throw new Error('Encryption key empty!');
   }
   options = {
     mode: 'gcm',
@@ -50,8 +48,7 @@ encryptData = function(key, data, adata) {
 decryptData = function(key, data) {
   var options_ret;
   if (key === '') {
-    console.error('Decryption key empty!');
-    return false;
+    throw new Error('Decryption key empty!');
   }
   options_ret = {};
   return sjcl.decrypt(key, data, {}, options_ret);
