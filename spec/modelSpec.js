@@ -44,7 +44,7 @@ MultiSubModel = Modelize({
   }
 });
 
-describe('Model', function() {
+describe('Public Model API', function() {
   beforeAll(function() {
     jasmine.Ajax.install();
     return this.instance = new Model();
@@ -117,8 +117,36 @@ describe('Model', function() {
     it('has an id', function() {
       return expect(this.instance.id).toBe(1);
     });
-    return it('has external keys', function() {
-      return expect(this.instance.submodel_id()).toBe(1);
+    return describe('Relation functions', function() {
+      it('has external keys', function() {
+        return expect(this.instance.submodel_id()).toBe(1);
+      });
+      it('gets has_one relations', function() {
+        var request;
+        this.instance.submodel_get({}, function(data) {
+          return expect(data).toEqual(jasmine.objectContaining({
+            id: 1
+          }));
+        });
+        request = jasmine.Ajax.requests.mostRecent();
+        return request.respondWith(Responses.general);
+      });
+      it('gets has_many relations', function() {
+        var request;
+        spyOn(this.instance, 'multisubmodels');
+        this.instance.multisubmodel_get({});
+        request = jasmine.Ajax.requests.mostRecent();
+        request.respondWith(Responses.generalMulti);
+        return expect(this.instance.multisubmodels).toHaveBeenCalled();
+      });
+      return it('creates has_many relations', function() {
+        var request;
+        spyOn(this.instance.multisubmodels, 'push');
+        this.instance.multisubmodel_add({});
+        request = jasmine.Ajax.requests.mostRecent();
+        request.respondWith(Responses.generalMulti);
+        return expect(this.instance.multisubmodels.push).toHaveBeenCalled();
+      });
     });
   });
 });

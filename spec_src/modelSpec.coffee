@@ -30,7 +30,7 @@ MultiSubModel = Modelize
     tests:
       model: 'Model'
 
-describe 'Model', ->
+describe 'Public Model API', ->
   beforeAll ->
     jasmine.Ajax.install()
 
@@ -103,5 +103,35 @@ describe 'Model', ->
     it 'has an id', ->
       expect(@instance.id).toBe 1
 
-    it 'has external keys', ->
-      expect(@instance.submodel_id()).toBe 1
+    describe 'Relation functions', ->
+      it 'has external keys', ->
+        expect(@instance.submodel_id()).toBe 1
+
+      it 'gets has_one relations', ->
+        @instance.submodel_get {}, (data) ->
+          expect(data).toEqual jasmine.objectContaining({ id: 1 })
+
+        request = jasmine.Ajax.requests.mostRecent()
+        request.respondWith Responses.general
+
+      it 'gets has_many relations', ->
+        spyOn @instance, 'multisubmodels'
+
+        @instance.multisubmodel_get {}
+
+        request = jasmine.Ajax.requests.mostRecent()
+        request.respondWith Responses.generalMulti
+
+        expect(@instance.multisubmodels).toHaveBeenCalled()
+        #expect(@instance.multisubmodels).toHaveBeenCalledWith jasmine.objectContaining({ id: 1 })
+
+      it 'creates has_many relations', ->
+        spyOn @instance.multisubmodels, 'push'
+
+        @instance.multisubmodel_add {}
+
+        request = jasmine.Ajax.requests.mostRecent()
+        request.respondWith Responses.generalMulti
+
+        expect(@instance.multisubmodels.push).toHaveBeenCalled()
+        #expect(@instance.multisubmodels.push).toHaveBeenCalledWith jasmine.objectContaining({ id: 1 })
