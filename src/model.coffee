@@ -7,8 +7,7 @@ Modelize = (options) ->
   'use strict'
 
   unless options.connector?
-    console.error 'No connector given for api: ' + options.api
-    return
+    throw new Error 'No connector given for api: ' + options.api
 
   options.connector.init options.api
 
@@ -70,16 +69,13 @@ Modelize = (options) ->
         fn = window[data.model]
 
         if typeof fn != 'function'
-          console.error 'No model for has_one/belongs_to relation found'
-          continue
+          throw new Error 'No model for has_one/belongs_to relation found'
 
-        if typeof self[name + '_id'] != 'function' && name not in options.belongs_to
+        if typeof self[name + '_id'] != 'function' && name not in options.belongs_to && name + '_id' not in options.editable
           unless options.editable?
             options.editable = []
 
           options.editable.push name + '_id'
-          console.log self[name + 'id']
-
 
         if self[name]?
           Observable self, name, new fn(self[name])
@@ -148,6 +144,7 @@ Modelize = (options) ->
     # Set editable fields
     #
     if options.editable?
+      console.log options.editable
       for index, name of options.editable
         Editable self, name, DelayedSave.apply(self, [options, self])
 
@@ -179,8 +176,7 @@ Modelize = (options) ->
     #
     self.update = (params, callback) =>
       unless self.id?
-        console.error 'Trying to update nonexisting model object'
-        return false
+        throw new Error 'Trying to update nonexisting model object'
 
       self.api().update(self.id, params).done callback
 
@@ -188,8 +184,7 @@ Modelize = (options) ->
     #
     self.destroy = (callback) =>
       unless self.id?
-        console.error 'Trying to delete nonexisting model object'
-        return false
+        throw new Error 'Trying to delete nonexisting model object'
 
       self.api().destroy(self.id).done callback
 
@@ -229,7 +224,7 @@ Modelize = (options) ->
     return self
 
   ###
-  # These are the collector functions and are not bound to a specific object but to the model
+  # These are the collection functions and are not bound to a specific object but to the model
   ###
 
   # Get objects from API and save into specified observable or callback
@@ -241,14 +236,12 @@ Modelize = (options) ->
 
     if typeof callbackOrObservable['push'] == 'undefined'
       if typeof callbackOrObservable != 'function'
-        console.log 'model.get 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven:'
-        console.log callbackOrObservable
+        throw new Error 'Collection.get 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable
 
       callback = callbackOrObservable
 
     if typeof params != 'object'
-      console.error params, typeof params
-      return
+      throw new Error 'Passed params is not an object: ' + typeof params
 
     if params? && params.id?
       connector.read(params.id, params).done callback
@@ -279,8 +272,7 @@ Modelize = (options) ->
 
     if typeof callbackOrObservable['push'] == 'undefined'
       if typeof callbackOrObservable != 'function'
-        console.log 'model.create 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven:'
-        console.log callbackOrObservable
+        throw new Error 'Collection.create 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable
 
       callback = (data) =>
         # Copy object hack
