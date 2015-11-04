@@ -260,6 +260,15 @@ Modelize = (options) ->
   # Shorthand for model.get, just provide a single ID
   #
   model.get_one = (id, callbackOrObservable) ->
+    callback = (data) ->
+      callbackOrObservable model(data)
+
+    if ko.isObservable(callbackOrObservable) == false
+      if typeof callbackOrObservable != 'function'
+        throw new Error 'Collection.get_one 2nd parameter needs to be either a function or an Observable.\nGiven: ' + callbackOrObservable
+
+      callback = callbackOrObservable
+
     model.get { id: id }, callbackOrObservable
 
   # Create new object with given params
