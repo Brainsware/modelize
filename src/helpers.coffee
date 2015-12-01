@@ -5,10 +5,10 @@ relationship_fields = (name, model, connector, options = {}) -> [name + '_id', n
 
 single_get_fn = (id_param, api_name, name, model, api, options = {}) ->
   (params = {}, callbackOrObservable) =>
-    callback = (data) =>
-      @[name] model(data)
-
-    if typeof callbackOrObservable['push'] == 'undefined'
+    unless callback?
+      callback = (data) =>
+        @[name] model(data)
+    else if typeof callbackOrObservable['push'] == 'undefined'
       if typeof callbackOrObservable != 'function'
         throw new Error 'model.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable
 
@@ -43,13 +43,18 @@ lazy_single_get_fn = (id_param, api_name, name, model, api, options) ->
   model.get_one @[id_param](), callback
 
 get_fn = (id_param, api_name, name, model, api, options = {}) ->
-  (params = {}, callback) =>
+  (params = {}, callbackOrObservable) =>
     unless callback?
       callback = (data) =>
         res = []
         for m in data
           res.push model(m)
         @[api_name] res
+    else if typeof callbackOrObservable['push'] == 'undefined'
+      if typeof callbackOrObservable != 'function'
+        throw new Error 'model.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable
+
+      callback = callbackOrObservable
 
     unless api?
       throw new Error 'No Connector found for resource "' + api_name + '" found: ', api
