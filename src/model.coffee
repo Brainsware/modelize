@@ -300,8 +300,10 @@ Modelize = (options) ->
   # Debug function
   model.encrypt_container = (data, container) ->
     data[model.encrypted_container] = {}
+
     for index, value of data
       if index in model.encrypted_editable
+        delete data[index]
         data[model.encrypted_container][index] = value
 
     encdata = encryptData(sessionStorage.getItem('appKey'), JSON.stringify(data[model.encrypted_container]))
