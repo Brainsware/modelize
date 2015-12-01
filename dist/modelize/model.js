@@ -298,6 +298,7 @@ Modelize = function(options) {
     for (index in data) {
       value = data[index];
       if (indexOf.call(model.encrypted_editable, index) >= 0) {
+        delete data[index];
         data[model.encrypted_container][index] = value;
       }
     }

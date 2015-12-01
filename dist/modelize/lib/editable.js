@@ -71,9 +71,11 @@ EncryptedDelayedSave = function(options, self) {
           var edit_value;
           self.save_encrypted_container();
           self['editing_' + prop](2);
-          edit_value = {};
-          edit_value[prop] = value;
-          return self.update(edit_value);
+          if (options.encrypted_debug === true) {
+            edit_value = {};
+            edit_value[prop] = value;
+            return self.update(edit_value);
+          }
         }, delay);
       }
     };

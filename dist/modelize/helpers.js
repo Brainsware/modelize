@@ -17,10 +17,11 @@ single_get_fn = function(id_param, api_name, name, model, api, options) {
       if (params == null) {
         params = {};
       }
-      callback = function(data) {
-        return _this[name](model(data));
-      };
-      if (typeof callbackOrObservable['push'] === 'undefined') {
+      if (typeof callback === "undefined" || callback === null) {
+        callback = function(data) {
+          return _this[name](model(data));
+        };
+      } else if (typeof callbackOrObservable['push'] === 'undefined') {
         if (typeof callbackOrObservable !== 'function') {
           throw new Error('model.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable);
         }
@@ -74,11 +75,12 @@ get_fn = function(id_param, api_name, name, model, api, options) {
     options = {};
   }
   return (function(_this) {
-    return function(params, callback) {
+    return function(params, callbackOrObservable) {
+      var callback;
       if (params == null) {
         params = {};
       }
-      if (callback == null) {
+      if (typeof callback === "undefined" || callback === null) {
         callback = function(data) {
           var i, len, m, res;
           res = [];
@@ -88,6 +90,11 @@ get_fn = function(id_param, api_name, name, model, api, options) {
           }
           return _this[api_name](res);
         };
+      } else if (typeof callbackOrObservable['push'] === 'undefined') {
+        if (typeof callbackOrObservable !== 'function') {
+          throw new Error('model.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable);
+        }
+        callback = callbackOrObservable;
       }
       if (api == null) {
         throw new Error('No Connector found for resource "' + api_name + '" found: ', api);
