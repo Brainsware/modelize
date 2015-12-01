@@ -135,3 +135,8 @@ describe 'Public Model API', ->
 
         expect(@instance.multisubmodels.push).toHaveBeenCalled()
         #expect(@instance.multisubmodels.push).toHaveBeenCalledWith jasmine.objectContaining({ id: 1 })
+
+      it 'exports external keys', ->
+        data = @instance.export()
+
+        expect(data).toEqual jasmine.objectContaining({ submodel_id: 1 })

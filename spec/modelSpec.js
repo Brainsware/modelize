@@ -139,13 +139,20 @@ describe('Public Model API', function() {
         request.respondWith(Responses.generalMulti);
         return expect(this.instance.multisubmodels).toHaveBeenCalled();
       });
-      return it('creates has_many relations', function() {
+      it('creates has_many relations', function() {
         var request;
         spyOn(this.instance.multisubmodels, 'push');
         this.instance.multisubmodel_add({});
         request = jasmine.Ajax.requests.mostRecent();
         request.respondWith(Responses.generalMulti);
         return expect(this.instance.multisubmodels.push).toHaveBeenCalled();
+      });
+      return it('exports external keys', function() {
+        var data;
+        data = this.instance["export"]();
+        return expect(data).toEqual(jasmine.objectContaining({
+          submodel_id: 1
+        }));
       });
     });
   });
