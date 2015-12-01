@@ -54,8 +54,8 @@ EncryptedDelayedSave = (options, self) ->
 
         self['editing_' + prop] 2
 
-        ## and for verification, save it unencrypted too
-        edit_value = {}
-        edit_value[prop] = value
-        self.update edit_value
+        if options.encrypted_debug == true
+          edit_value = {}
+          edit_value[prop] = value
+          self.update edit_value
       , delay)
