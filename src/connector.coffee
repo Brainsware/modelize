@@ -1,8 +1,12 @@
 class Connector
-  constructor: (base = '/api/', @type = 'jquery.rest') ->
-    @connector = new $.RestClient base,
+  constructor: (base = '/api/', @type = 'jquery.rest', settings = {}) ->
+    default_settings =
       stripTrailingSlash: true
       methodOverride:     true
+
+    settings = Ham.merge settings, default_settings
+
+    @connector = new $.RestClient base, settings
 
   get: (main_api) =>
     return @connector[main_api]
