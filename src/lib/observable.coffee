@@ -26,18 +26,6 @@ ObservableArray = (self, property, initial_value) ->
 Computed = (self, property, fn) -> self[property] = ko.computed fn, self
 PureComputed = (self, property, fn) -> self[property] = ko.pureComputed fn, self
 
-ComputedArray = (self, property, fn) ->
-  actual_property = '_actual_' + property
-  property_fn = '_' + property
-
-  ObservableArray self, actual_property
-
-  self[property_fn] = =>
-    self[actual_property] fn()
-    return self[actual_property]()
-
-  self[property] = ko.computed self[property_fn]
-
 LazyObservable = (self, property, callback, params = [], init_value = null, make_array = false) ->
   unless make_array
     _value = ko.observable init_value

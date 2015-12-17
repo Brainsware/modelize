@@ -162,9 +162,6 @@ Modelize = (options) ->
     if options.purecomputed?
       for name, fn of options.purecomputed
         PureComputed self, name, fn
-    if options.computed_array?
-      for name, fn of options.computed_array
-        ComputedArray self, name, fn
 
     # Add user defined functions
     #
