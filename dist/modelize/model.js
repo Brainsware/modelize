@@ -16,7 +16,7 @@ Modelize = function(options) {
   }
   connector = options.connector.get(options.api);
   model = function(self) {
-    var data, fn, i, index, item, items, len, name, ref, ref1, ref10, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, relation_params;
+    var data, fn, i, index, item, items, len, name, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, relation_params;
     if (self == null) {
       self = {};
     }
@@ -129,17 +129,10 @@ Modelize = function(options) {
         PureComputed(self, name, fn);
       }
     }
-    if (options.computed_array != null) {
-      ref9 = options.computed_array;
+    if (options.functions != null) {
+      ref9 = options.functions;
       for (name in ref9) {
         fn = ref9[name];
-        ComputedArray(self, name, fn);
-      }
-    }
-    if (options.functions != null) {
-      ref10 = options.functions;
-      for (name in ref10) {
-        fn = ref10[name];
         self[name] = fn;
       }
     }
@@ -172,7 +165,7 @@ Modelize = function(options) {
     })(this);
     self["export"] = (function(_this) {
       return function(id) {
-        var has_data, ref11, ref12, ref13;
+        var has_data, ref10, ref11, ref12;
         if (id == null) {
           id = false;
         }
@@ -181,23 +174,23 @@ Modelize = function(options) {
           data['id'] = self['id'];
         }
         if (options.editable != null) {
-          ref11 = options.editable;
+          ref10 = options.editable;
+          for (index in ref10) {
+            name = ref10[index];
+            data[name] = self[name]();
+          }
+        }
+        if (options.encrypted_editable != null) {
+          ref11 = options.encrypted_editable;
           for (index in ref11) {
             name = ref11[index];
             data[name] = self[name]();
           }
         }
-        if (options.encrypted_editable != null) {
-          ref12 = options.encrypted_editable;
-          for (index in ref12) {
-            name = ref12[index];
-            data[name] = self[name]();
-          }
-        }
         if (options.belongs_to != null) {
-          ref13 = options.belongs_to;
-          for (name in ref13) {
-            has_data = ref13[name];
+          ref12 = options.belongs_to;
+          for (name in ref12) {
+            has_data = ref12[name];
             data[name + '_id'] = self[name + '_id']();
           }
         }

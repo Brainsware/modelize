@@ -4,7 +4,7 @@ Editable = function(self, property, callback) {
   var editing_property;
   editing_property = 'editing_' + property;
   Observable(self, property);
-  Observable(self, editing_property, 0);
+  Observable(self, editing_property, 'default');
   self[property].subscribe((function(_this) {
     return function(new_value) {
       var r;
@@ -22,7 +22,7 @@ DelayedSave = function(options, self) {
       }
       if (self.id != null) {
         if (self['editing_' + prop] != null) {
-          self['editing_' + prop](1);
+          self['editing_' + prop]('pending');
         }
         if (window.timeoutEditor == null) {
           window.timeoutEditor = {};
@@ -34,7 +34,7 @@ DelayedSave = function(options, self) {
         return window.timeoutEditor[options.api + self.id][prop] = setTimeout(function() {
           var edit_value;
           if (self['editing_' + prop] != null) {
-            self['editing_' + prop](2);
+            self['editing_' + prop]('success');
           }
           edit_value = {};
           edit_value[prop] = value;
@@ -62,7 +62,7 @@ EncryptedDelayedSave = function(options, self) {
       }
       self[options.encrypted_container][prop] = value;
       if (self.id != null) {
-        self['editing_' + prop](1);
+        self['editing_' + prop]('pending');
         if (window.timeoutEditor == null) {
           window.timeoutEditor = {};
         }
@@ -70,7 +70,9 @@ EncryptedDelayedSave = function(options, self) {
         return window.timeoutEditor[options.api + self.id] = setTimeout(function() {
           var edit_value;
           self.save_encrypted_container();
-          self['editing_' + prop](2);
+          if (self['editing_' + prop] != null) {
+            self['editing_' + prop]('success');
+          }
           if (options.encrypted_debug === true) {
             edit_value = {};
             edit_value[prop] = value;

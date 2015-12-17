@@ -2,18 +2,24 @@ var Connector,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 Connector = (function() {
-  function Connector(base, type) {
+  function Connector(base, type, settings) {
+    var default_settings;
     if (base == null) {
       base = '/api/';
     }
     this.type = type != null ? type : 'jquery.rest';
+    if (settings == null) {
+      settings = {};
+    }
     this.add_apis_to = bind(this.add_apis_to, this);
     this.init = bind(this.init, this);
     this.get = bind(this.get, this);
-    this.connector = new $.RestClient(base, {
+    default_settings = {
       stripTrailingSlash: true,
       methodOverride: true
-    });
+    };
+    settings = Ham.merge(settings, default_settings);
+    this.connector = new $.RestClient(base, settings);
   }
 
   Connector.prototype.get = function(main_api) {
