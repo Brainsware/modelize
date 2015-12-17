@@ -1,6 +1,6 @@
 {
   "name": "modelize",
-  "version": "2.0.2",
+  "version": "2.0.4",
   "main": "dist/modelize.min.js",
   "description": "Knockout.js REST and encryptable models",
   "homepage": "http://brainsware.org",
@@ -19,7 +19,7 @@
   "dependencies": {
     "knockout": ">=3.1.0",
     "sjcl": "1.*",
-    "jquery": "2.1",
+    "jquery": "2.1.*",
     "jquery.rest": "*"
   },
   "devDependencies": {
