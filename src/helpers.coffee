@@ -44,13 +44,13 @@ lazy_single_get_fn = (id_param, api_name, name, model, api, options) ->
 
 get_fn = (id_param, api_name, name, model, api, options = {}) ->
   (params = {}, callbackOrObservable) =>
-    unless callback?
-      callback = (data) =>
-        res = []
-        for m in data
-          res.push model(m)
-        @[api_name] res
-    else if typeof callbackOrObservable['push'] == 'undefined'
+    callback = (data) =>
+      res = []
+      for m in data
+        res.push model(m)
+      @[api_name] res
+
+    if callbackOrObservable? && typeof callbackOrObservable['push'] == 'undefined'
       if typeof callbackOrObservable != 'function'
         throw new Error 'model.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable
 
