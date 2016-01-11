@@ -1,52 +1,54 @@
 Responses =
   general:
     status: 200
-    responseText: '{"id": 1, "submodel_id": 1}'
+    responseText: '{"id": 1, "author_id": 1}'
   generalMulti:
     status: 200
     responseText: '[{"id": 1}]'
 
-co = new Connector('/')
+co = new RESTConnector('/')
 
-Model = Modelize
-  api: 'tests'
+Post = Modelize
+  api: 'posts'
   connector: co
   has_one:
-    submodel:
-      model: 'SubModel'
+    author:
+      model: 'Author'
   has_many:
-    multisubmodel:
-      model: 'MultiSubModel'
+    comment:
+      model: 'Comment'
   editable: [ 'fieldOne', 'fieldTwo' ]
 
-SubModel = Modelize
-  api: 'subtests'
+# Single Submodel
+Author = Modelize
+  api: 'authors'
   connector: co
 
-MultiSubModel = Modelize
-  api: 'multisubtests'
+# Multi Submodel
+Comment = Modelize
+  api: 'comments'
   connector: co
   belongs_to:
-    tests:
-      model: 'Model'
+    posts:
+      model: 'Post'
 
 describe 'Public Model API', ->
   beforeAll ->
     jasmine.Ajax.install()
 
-    @instance = new Model()
+    @instance = new Post()
 
   it 'is a function', ->
-    expect(typeof Model).toBe 'function'
+    expect(typeof Post).toBe 'function'
 
   it 'gets and calls a function', ->
-    Model.get {}, (data) ->
+    Post.get {}, (data) ->
       expect(typeof data).toBe 'object'
       expect(data.id).toBe 1
 
     request = jasmine.Ajax.requests.mostRecent()
 
-    expect(request.url).toBe '/tests'
+    expect(request.url).toBe '/posts'
     expect(request.method).toBe 'GET'
     expect(request.data()).toEqual {}
 
@@ -56,7 +58,7 @@ describe 'Public Model API', ->
     ObservableArray @, 'test'
     spyOn @test, 'push'
 
-    Model.get {}, @test
+    Post.get {}, @test
 
     request = jasmine.Ajax.requests.mostRecent()
     request.respondWith Responses.generalMulti
@@ -65,13 +67,13 @@ describe 'Public Model API', ->
     expect(@test.push).toHaveBeenCalledWith jasmine.objectContaining({ id: 1 })
 
   it 'creates and calls a function', ->
-    Model.create {}, (data) ->
+    Post.create {}, (data) ->
       expect(typeof data).toBe 'object'
       expect(data.id).toBe 1
 
     request = jasmine.Ajax.requests.mostRecent()
 
-    expect(request.url).toBe '/tests'
+    expect(request.url).toBe '/posts'
     expect(request.method).toBe 'POST'
     expect(request.data()).toEqual {}
 
@@ -81,7 +83,7 @@ describe 'Public Model API', ->
     ObservableArray @, 'test'
     spyOn @test, 'push'
 
-    Model.create {}, @test
+    Post.create {}, @test
 
     request = jasmine.Ajax.requests.mostRecent()
     request.respondWith Responses.general
@@ -91,8 +93,8 @@ describe 'Public Model API', ->
 
   describe 'Instance functions', ->
     beforeAll ->
-      Model.get_one 1, (data) =>
-        @instance = new Model(data)
+      Post.get_one 1, (data) =>
+        @instance = new Post(data)
 
       request = jasmine.Ajax.requests.mostRecent()
       request.respondWith Responses.general
@@ -105,38 +107,38 @@ describe 'Public Model API', ->
 
     describe 'Relation functions', ->
       it 'has external keys', ->
-        expect(@instance.submodel_id()).toBe 1
+        expect(@instance.author_id()).toBe 1
 
       it 'gets has_one relations', ->
-        @instance.submodel_get {}, (data) ->
+        @instance.author_get {}, (data) ->
           expect(data).toEqual jasmine.objectContaining({ id: 1 })
 
         request = jasmine.Ajax.requests.mostRecent()
         request.respondWith Responses.general
 
       it 'gets has_many relations', ->
-        spyOn @instance, 'multisubmodels'
+        spyOn @instance, 'comments'
 
-        @instance.multisubmodel_get {}
+        @instance.comment_get {}
 
         request = jasmine.Ajax.requests.mostRecent()
         request.respondWith Responses.generalMulti
 
-        expect(@instance.multisubmodels).toHaveBeenCalled()
-        #expect(@instance.multisubmodels).toHaveBeenCalledWith jasmine.objectContaining({ id: 1 })
+        expect(@instance.comments).toHaveBeenCalled()
+        #expect(@instance.comments).toHaveBeenCalledWith jasmine.objectContaining({ id: 1 })
 
       it 'creates has_many relations', ->
-        spyOn @instance.multisubmodels, 'push'
+        spyOn @instance.comments, 'push'
 
-        @instance.multisubmodel_add {}
+        @instance.comment_add {}
 
         request = jasmine.Ajax.requests.mostRecent()
         request.respondWith Responses.generalMulti
 
-        expect(@instance.multisubmodels.push).toHaveBeenCalled()
-        #expect(@instance.multisubmodels.push).toHaveBeenCalledWith jasmine.objectContaining({ id: 1 })
+        expect(@instance.comments.push).toHaveBeenCalled()
+        #expect(@instance.comments.push).toHaveBeenCalledWith jasmine.objectContaining({ id: 1 })
 
       it 'exports external keys', ->
         data = @instance.export()
 
-        expect(data).toEqual jasmine.objectContaining({ submodel_id: 1 })
+        expect(data).toEqual jasmine.objectContaining({ author_id: 1 })
