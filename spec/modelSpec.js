@@ -1,9 +1,9 @@
-var Model, MultiSubModel, Responses, SubModel, co;
+var Author, Comment, Post, Responses, co;
 
 Responses = {
   general: {
     status: 200,
-    responseText: '{"id": 1, "submodel_id": 1}'
+    responseText: '{"id": 1, "author_id": 1}'
   },
   generalMulti: {
     status: 200,
@@ -11,35 +11,35 @@ Responses = {
   }
 };
 
-co = new Connector('/');
+co = new RESTConnector('/');
 
-Model = Modelize({
-  api: 'tests',
+Post = Modelize({
+  api: 'posts',
   connector: co,
   has_one: {
-    submodel: {
-      model: 'SubModel'
+    author: {
+      model: 'Author'
     }
   },
   has_many: {
-    multisubmodel: {
-      model: 'MultiSubModel'
+    comment: {
+      model: 'Comment'
     }
   },
   editable: ['fieldOne', 'fieldTwo']
 });
 
-SubModel = Modelize({
-  api: 'subtests',
+Author = Modelize({
+  api: 'authors',
   connector: co
 });
 
-MultiSubModel = Modelize({
-  api: 'multisubtests',
+Comment = Modelize({
+  api: 'comments',
   connector: co,
   belongs_to: {
-    tests: {
-      model: 'Model'
+    posts: {
+      model: 'Post'
     }
   }
 });
@@ -47,19 +47,19 @@ MultiSubModel = Modelize({
 describe('Public Model API', function() {
   beforeAll(function() {
     jasmine.Ajax.install();
-    return this.instance = new Model();
+    return this.instance = new Post();
   });
   it('is a function', function() {
-    return expect(typeof Model).toBe('function');
+    return expect(typeof Post).toBe('function');
   });
   it('gets and calls a function', function() {
     var request;
-    Model.get({}, function(data) {
+    Post.get({}, function(data) {
       expect(typeof data).toBe('object');
       return expect(data.id).toBe(1);
     });
     request = jasmine.Ajax.requests.mostRecent();
-    expect(request.url).toBe('/tests');
+    expect(request.url).toBe('/posts');
     expect(request.method).toBe('GET');
     expect(request.data()).toEqual({});
     return request.respondWith(Responses.general);
@@ -68,7 +68,7 @@ describe('Public Model API', function() {
     var request;
     ObservableArray(this, 'test');
     spyOn(this.test, 'push');
-    Model.get({}, this.test);
+    Post.get({}, this.test);
     request = jasmine.Ajax.requests.mostRecent();
     request.respondWith(Responses.generalMulti);
     expect(this.test.push).toHaveBeenCalled();
@@ -78,12 +78,12 @@ describe('Public Model API', function() {
   });
   it('creates and calls a function', function() {
     var request;
-    Model.create({}, function(data) {
+    Post.create({}, function(data) {
       expect(typeof data).toBe('object');
       return expect(data.id).toBe(1);
     });
     request = jasmine.Ajax.requests.mostRecent();
-    expect(request.url).toBe('/tests');
+    expect(request.url).toBe('/posts');
     expect(request.method).toBe('POST');
     expect(request.data()).toEqual({});
     return request.respondWith(Responses.general);
@@ -92,7 +92,7 @@ describe('Public Model API', function() {
     var request;
     ObservableArray(this, 'test');
     spyOn(this.test, 'push');
-    Model.create({}, this.test);
+    Post.create({}, this.test);
     request = jasmine.Ajax.requests.mostRecent();
     request.respondWith(Responses.general);
     expect(this.test.push).toHaveBeenCalled();
@@ -103,9 +103,9 @@ describe('Public Model API', function() {
   return describe('Instance functions', function() {
     beforeAll(function() {
       var request;
-      Model.get_one(1, (function(_this) {
+      Post.get_one(1, (function(_this) {
         return function(data) {
-          return _this.instance = new Model(data);
+          return _this.instance = new Post(data);
         };
       })(this));
       request = jasmine.Ajax.requests.mostRecent();
@@ -119,11 +119,11 @@ describe('Public Model API', function() {
     });
     return describe('Relation functions', function() {
       it('has external keys', function() {
-        return expect(this.instance.submodel_id()).toBe(1);
+        return expect(this.instance.author_id()).toBe(1);
       });
       it('gets has_one relations', function() {
         var request;
-        this.instance.submodel_get({}, function(data) {
+        this.instance.author_get({}, function(data) {
           return expect(data).toEqual(jasmine.objectContaining({
             id: 1
           }));
@@ -133,25 +133,25 @@ describe('Public Model API', function() {
       });
       it('gets has_many relations', function() {
         var request;
-        spyOn(this.instance, 'multisubmodels');
-        this.instance.multisubmodel_get({});
+        spyOn(this.instance, 'comments');
+        this.instance.comment_get({});
         request = jasmine.Ajax.requests.mostRecent();
         request.respondWith(Responses.generalMulti);
-        return expect(this.instance.multisubmodels).toHaveBeenCalled();
+        return expect(this.instance.comments).toHaveBeenCalled();
       });
       it('creates has_many relations', function() {
         var request;
-        spyOn(this.instance.multisubmodels, 'push');
-        this.instance.multisubmodel_add({});
+        spyOn(this.instance.comments, 'push');
+        this.instance.comment_add({});
         request = jasmine.Ajax.requests.mostRecent();
         request.respondWith(Responses.generalMulti);
-        return expect(this.instance.multisubmodels.push).toHaveBeenCalled();
+        return expect(this.instance.comments.push).toHaveBeenCalled();
       });
       return it('exports external keys', function() {
         var data;
         data = this.instance["export"]();
         return expect(data).toEqual(jasmine.objectContaining({
-          submodel_id: 1
+          author_id: 1
         }));
       });
     });
