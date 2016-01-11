@@ -6,7 +6,7 @@ describe 'RelationshipFn', ->
 
 describe 'GetHelper', ->
   beforeAll ->
-    connector = new Connector('/')
+    connector = new RESTConnector('/')
     connector.init 'tests'
 
     fields = relationship_fields('test', null, connector)

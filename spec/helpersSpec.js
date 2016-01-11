@@ -9,7 +9,7 @@ describe('RelationshipFn', function() {
 describe('GetHelper', function() {
   beforeAll(function() {
     var connector, fields;
-    connector = new Connector('/');
+    connector = new RESTConnector('/');
     connector.init('tests');
     fields = relationship_fields('test', null, connector);
     this.multi_get = get_fn.apply(self, fields);
