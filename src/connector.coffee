@@ -1,5 +1,5 @@
-class Connector
-  constructor: (base = '/api/', @type = 'jquery.rest', settings = {}) ->
+class RESTConnector
+  constructor: (base = '/api/', settings = {}) ->
     default_settings =
       stripTrailingSlash: true
       methodOverride:     true
@@ -8,15 +8,13 @@ class Connector
 
     @connector = new $.RestClient base, settings
 
-  get: (main_api) =>
-    return @connector[main_api]
+  get: (base_uri) =>
+    return @connector[base_uri]
 
-  init: (resource) =>
+  init: (resource, sub_resources = []) =>
     @connector.add resource unless @connector[resource]?
 
-  add_apis_to: (sub_apis, main_api) =>
-    for name, data of sub_apis
-      @connector[main_api].add name + 's' unless @connector[main_api][name + 's']
-
+    for name, data of sub_resources
+      @connector[resource].add name + 's' unless @connector[resource][name + 's']
 
 module.exports = Connector if module?
