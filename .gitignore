@@ -19,8 +19,9 @@ local.properties
 .*/
 /vendor/
 cache/
+dist/
 node_modules/*
-dist/modelize/*
+dist/modelize
 
 # External tool builders
 .externalToolBuilders/
