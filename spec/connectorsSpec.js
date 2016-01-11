@@ -1,6 +1,6 @@
-describe('Connector', function() {
+describe('REST Connector', function() {
   beforeAll(function() {
-    this.connector = new Connector('/');
+    this.connector = new RESTConnector('/');
     return this.connector.init('tests');
   });
   it('is an object', function() {

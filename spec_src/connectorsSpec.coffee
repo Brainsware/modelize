@@ -1,6 +1,6 @@
-describe 'Connector', ->
+describe 'REST Connector', ->
   beforeAll ->
-    @connector = new Connector('/')
+    @connector = new RESTConnector('/')
     @connector.init 'tests'
 
   it 'is an object', ->
