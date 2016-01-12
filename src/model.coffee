@@ -7,13 +7,14 @@ Modelize = (options) ->
   'use strict'
 
   unless options.connector?
-    throw new Error 'No connector given for api: ' + options.api
+    throw new Error 'No connector given for API URI: ' + options.api
 
-  options.connector.init options.api
+  sub_resources = []
 
-  options.connector.add_apis_to options.has_one, options.api if options.has_one?
+  sub_resources = object_merge sub_resources, options.has_one if options.has_one?
+  sub_resources = object_merge sub_resources, options.has_many if options.has_many?
 
-  options.connector.add_apis_to options.has_many, options.api if options.has_many?
+  options.connector.init options.api, sub_resources
 
   connector = options.connector.get options.api
 
@@ -27,10 +28,8 @@ Modelize = (options) ->
     #
     self.api = -> connector
 
-    # Check if de/encryption functions should be included
-    #
-    if options.encrypted_container?
-      Encryptable self, options.encrypted_container, options.encrypted_editable
+    if options.hash_salt?
+      self.hash_salt = options.hash_salt
 
     # Include sortable functions
     if options.sortable? && options.sortable == true
@@ -60,11 +59,11 @@ Modelize = (options) ->
       for index, name of options.editable
         Editable self, name, DelayedSave.apply(self, [options, self])
 
-    # Encrypted editable fields
+    # Hashed editable fields
     #
-    if options.encrypted_editable?
-      for index, name of options.encrypted_editable
-        Editable self, name, EncryptedDelayedSave.apply(self, [options, self])
+    if options.hashed_index?
+      for index, name of options.hashed_index
+        Editable self, name, HashedSave.apply(self, [options, self])
 
     # Set computed fields
     #
@@ -103,9 +102,6 @@ Modelize = (options) ->
       self.api().create(self.export()).done (data) =>
         self.id = data.id
 
-        if options.encrypted_container?
-          self.enc_update data
-
         callback()
 
     # Export all model data as an array
@@ -118,10 +114,6 @@ Modelize = (options) ->
 
       if options.editable?
         for index, name of options.editable
-          data[name] = self[name]()
-
-      if options.encrypted_editable?
-        for index, name of options.encrypted_editable
           data[name] = self[name]()
 
       if options.belongs_to?
@@ -151,6 +143,15 @@ Modelize = (options) ->
 
     if typeof params != 'object'
       throw new Error 'Passed params is not an object: ' + typeof params
+
+    if options.hashed_index? && params?
+      salt = ''
+      if options.hash_salt?
+        salt = options.hash_salt
+
+      for param of params
+        if param in options.hashed_index
+          params[param] = getHash(params[param] + salt)
 
     if params? && params.id?
       connector.read(params.id, params).done callback
@@ -193,32 +194,11 @@ Modelize = (options) ->
         callbackOrObservable(data)
 
     if params.length > 0 || typeof params == 'object'
-      if model.encrypted_container?
-        params = model.encrypt_container(params)
-
       connector.create(params).done callback
     else
       connector.create().done callback
 
     return
-
-  model.encrypted_container = options.encrypted_container if options.encrypted_container?
-
-  model.encrypted_editable = options.encrypted_editable if options.encrypted_editable?
-
-  # Debug function
-  model.encrypt_container = (data, container) ->
-    data[model.encrypted_container] = {}
-
-    for index, value of data
-      if index in model.encrypted_editable
-        delete data[index]
-        data[model.encrypted_container][index] = value
-
-    encdata = encryptData(sessionStorage.getItem('appKey'), JSON.stringify(data[model.encrypted_container]))
-    data[model.encrypted_container] = encdata
-
-    return data
 
   return model
 
