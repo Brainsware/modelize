@@ -26,6 +26,13 @@ ObservableArray = (self, property, initial_value) ->
 Computed = (self, property, fn) -> self[property] = ko.computed fn, self
 PureComputed = (self, property, fn) -> self[property] = ko.pureComputed fn, self
 
+MappedObservable = (self, property, container) ->
+  self[property] = ko.computed
+    read: ->
+      container[property]()
+    write: (value) ->
+      container[property](value)
+
 LazyObservable = (self, property, callback, params = [], init_value = null, make_array = false) ->
   unless make_array
     _value = ko.observable init_value
@@ -35,7 +42,6 @@ LazyObservable = (self, property, callback, params = [], init_value = null, make
   self[property] = ko.computed
     read: ->
       if self[property].loaded() == false
-        console.debug 'LazyLoading property', property
         callback.apply(self, params)
       return _value()
     write: (newValue) ->
@@ -51,9 +57,7 @@ LazyObservable = (self, property, callback, params = [], init_value = null, make
     self[property].splice = (e, i, args) ->
       return _value.splice e, i, args
 
-  #expose the current state, which can be bound against
   self[property].loaded = ko.observable false
-  #load it again
   self[property].refresh = ->
     self[property].loaded(false)
 
