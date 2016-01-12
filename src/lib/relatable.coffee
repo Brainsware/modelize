@@ -5,7 +5,7 @@ Relatable = (self, options) ->
   if options.belongs_to?
     unless options.has_one?
       options.has_one = []
-    options.has_one = Ham.merge options.belongs_to, options.has_one
+    options.has_one = object_merge options.belongs_to, options.has_one
   else
     options.belongs_to = []
 
@@ -20,7 +20,7 @@ Relatable = (self, options) ->
   #
   if options.has_one?
     for name, data of options.has_one
-      Ham.merge data,
+      object_merge data,
         model: name.capitalize()
 
       relation_params = relationship_fields name, data.model, self.api(), options
@@ -63,7 +63,7 @@ Relatable = (self, options) ->
   #
   if options.has_many?
     for name, data of options.has_many
-      Ham.merge data,
+      object_merge data,
         model: name.capitalize()
 
       relation_params = relationship_fields name, data.model, self.api(), options

@@ -4,7 +4,7 @@ class RESTConnector
       stripTrailingSlash: true
       methodOverride:     true
 
-    settings = Ham.merge settings, default_settings
+    settings = object_merge settings, default_settings
 
     @connector = new $.RestClient base, settings
 
