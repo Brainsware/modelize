@@ -16,7 +16,6 @@
 #   * per_page - optional    - how many items to load per page, default 20
 
 if require?
-  Ham         = require '../ham'
   Observables = require '../lib/observable'
   Observable  = Observables.Observable
   Computed    = Observables.Computed
@@ -28,12 +27,12 @@ Paginated = (self, options) ->
   # For convenience, if options is only a function, build an object holding the given function
   options = { method: options } if 'function' == typeof options
 
-  # Fail early if given options is not an object! 
+  # Fail early if given options is not an object!
   unless 'object' == typeof options
     throw new Error 'Invalid type for second parameter (' + typeof options + '), expected function or object'
 
   # set some default values in the options if not present
-  options = Ham.merge options,
+  options = object_merge options,
     per_page: 20
     page: 0
 
@@ -75,19 +74,19 @@ Paginated.add_paginated_methods = (self, options) ->
 
   self.last_page = =>
     self.__page (self.count() - 1)
-    
+
     self.__collection self.__reload()
 
   self.previous_page = =>
     return unless self.page() > 0
-    
+
     self.__page (self.page() - 1)
 
     self.__collection self.__reload()
 
   self.next_page = =>
     return unless self.page() + 1 < self.pages()
-    
+
     self.__page (self.page() + 1)
 
     self.__collection self.__reload()
