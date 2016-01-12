@@ -10,7 +10,7 @@ Editable = (self, property, callback) ->
 
   return self
 
-DelayedSave = (options, self) ->
+DelayedSave = (options, self, datahandler = null) ->
   (value, prop, delay = 250) =>
     if self.id?
       if self['editing_' + prop]?
@@ -26,32 +26,22 @@ DelayedSave = (options, self) ->
 
         edit_value = {}
         edit_value[prop] = value
+        if datahandler?
+          edit_value[prop] = datahandler.save(value)
         self.update edit_value
       , delay)
 
-EncryptedDelayedSave = (options, self) ->
-  (value, prop, delay = 250) =>
-    if typeof self[options.encrypted_container] != 'object' || self[options.encrypted_container] == null
-      self[options.encrypted_container] = {}
-
-      for index, name of options.encrypted_editable
-        self[options.encrypted_container][name] = self[name]()
-
-    self[options.encrypted_container][prop] = value
-
+HashedSave = (options, self) ->
+  (value, prop) =>
     if self.id?
-      self['editing_' + prop] 'pending'
+      if self['editing_' + prop]?
+        self['editing_' + prop] 'pending'
 
-      window.timeoutEditor = {} unless window.timeoutEditor?
-      clearTimeout(window.timeoutEditor[options.api + self.id])
-      window.timeoutEditor[options.api + self.id] = setTimeout(=>
-        self.save_encrypted_container()
+      if self.encryption_salt?
+        value += self.encryption_salt
+      else
+        console.log 'No salt for hash found. Intentional?'
 
-        if self['editing_' + prop]?
-          self['editing_' + prop] 'success'
-
-        if options.encrypted_debug == true
-          edit_value = {}
-          edit_value[prop] = value
-          self.update edit_value
-      , delay)
+      edit_value = {}
+      edit_value[prop] = getHash(value)
+      self.update edit_value
