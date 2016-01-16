@@ -4,7 +4,7 @@
 #
 # @param [Object] options The main configuration object for container
 #
-Container = (options) ->
+Container = (options = {}) ->
   'use strict'
 
   # Provide the constructor function for the container object.
