@@ -87,10 +87,6 @@ Relatable = (self, options) ->
       #
       self[name + '_add'] = create_fn.apply self, relation_params
 
-      # Update
-      #
-      self[name + '_update'] = update_fn.apply self, relation_params
-
       # Destroy
       #
       self[name + '_destroy'] = destroy_fn.apply self, relation_params
