@@ -7,8 +7,9 @@ Containable = (self, options) ->
 
     Observable self, name, new container_fn(data)
 
-    for editable in self[name]().editables
-      MappedObservable self, editable, self[name]()
+    if first_class?
+      for editable in self[name]().editables
+        MappedObservable self, editable, self[name]()
 
     self[name]().__updated.subscribe (data) =>
       callback = DelayedSave.apply(self, [options, self, datahandler])
