@@ -84,24 +84,8 @@ create_fn = (id_param, api_name, name, model, api, options) ->
     else
       api[api_name].create(@.id, params).done callback
 
-update_fn = (id_param, api_name, name, model, api, options) ->
-  (id, params, callback) =>
-    unless @.id?
-      throw new Error 'Empty ID. Save parent model first!'
-
-    if model.encrypted_container?
-      params = model.encrypt_container(params)
-
-    if options.belongs_to?
-      api[api_name].update(options.belongs_to, @.id, id, params).done callback
-    else
-      api[api_name].update(@.id, id, params).done callback
-
-    if @.after_update?
-      @.after_update()
-
 destroy_fn = (id_param, api_name, name, model, api, options) ->
-  (id, callback) =>
+  (callback) =>
     unless callback?
       callback = (data) =>
         @[api_name].remove element
