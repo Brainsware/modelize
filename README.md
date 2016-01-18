@@ -96,7 +96,7 @@ relations()
 Post.comments()
 ```
 
-has_many relation access is always extended with an 's'. So relation 'comment', turns to to 'comments'
+has_many relation access is always extended with an 's'. So relation 'comment', turns to 'comments'
 
 ```coffee
 relation_get([parameters], [callbackOrObservable])
@@ -152,12 +152,41 @@ export([id])
 
 ## Containers
 
-### Usage
+Containers are defined just like the main models, with the exception that they only support the observable types and don't have any api/connector or relational options.
+
+### Definition
+
+```coffee
+MetaInformation = Container
+  editable: [
+    'title',
+    'description'
+  ]
+```
+
+### Usage and options
 
 ```coffee
 Post = Modelize
   container:
-    MetaInformation: {}
+    MetaInformation:
+      first_class: true
 ```
 
-### Definition
+```coffee
+datahandler: [object, default: instance of JSONHandler]
+```
+
+```coffee
+first_class: [bool, default: false]
+```
+
+If this is set to true, then all editables are mapped to the main model object and available for direct editing.
+
+```coffee
+container: [string, default: container option name]
+```
+
+```coffee
+field: [string, default: container option name]
+```
