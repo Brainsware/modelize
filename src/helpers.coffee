@@ -4,11 +4,11 @@
 relationship_fields = (name, model, connector, options = {}) -> [name + '_id', name + 's', name, window[model], connector, options]
 
 single_get_fn = (id_param, api_name, name, model, api, options = {}) ->
-  (params = {}, callbackOrObservable) =>
-    unless callback?
-      callback = (data) =>
-        @[name] model(data)
-    else if typeof callbackOrObservable['push'] == 'undefined'
+  (callbackOrObservable) =>
+    callback = (data) =>
+      @[name] model(data)
+
+    if callbackOrObservable? && typeof callbackOrObservable['push'] == 'undefined'
       if typeof callbackOrObservable != 'function'
         throw new Error 'model.find 2nd parameter needs to be either a function or a pushable object (Array, ObservableArray).\nGiven: ' + callbackOrObservable
 
