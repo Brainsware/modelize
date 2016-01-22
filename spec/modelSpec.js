@@ -123,7 +123,7 @@ describe('Public Model API', function() {
       });
       it('gets has_one relations', function() {
         var request;
-        this.instance.author_get({}, function(data) {
+        this.instance.author_get(function(data) {
           return expect(data).toEqual(jasmine.objectContaining({
             id: 1
           }));

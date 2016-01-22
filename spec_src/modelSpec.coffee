@@ -110,7 +110,7 @@ describe 'Public Model API', ->
         expect(@instance.author_id()).toBe 1
 
       it 'gets has_one relations', ->
-        @instance.author_get {}, (data) ->
+        @instance.author_get (data) ->
           expect(data).toEqual jasmine.objectContaining({ id: 1 })
 
         request = jasmine.Ajax.requests.mostRecent()
