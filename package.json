@@ -1,7 +1,7 @@
 {
   "name": "modelize",
   "title": "modelize",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "license": "MIT",
   "description": "REST model interface for KnockoutJS",
   "homepage": "http://brainsware.org",
