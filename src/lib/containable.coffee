@@ -7,13 +7,17 @@ Containable = (self, options) ->
 
     Observable self, name, new container_fn(data)
 
-    if first_class?
+    if first_class == true
       for editable in self[name]().editables
         MappedObservable self, editable, self[name]()
 
     self[name]().__updated.subscribe (data) =>
       callback = DelayedSave.apply(self, [options, self, datahandler])
       callback data, field
+
+    self[name].subscribe =>
+      callback = DelayedSave.apply(self, [options, self, datahandler])
+      callback self[name](), field
 
   # Set containers with type 'multi'
   #
@@ -35,6 +39,7 @@ Containable = (self, options) ->
 
     self[name + '_add'] = (params = {}) =>
       c = container_fn(params)
+
       self[name].push c
       c.__updated.subscribe =>
         callback = DelayedSave.apply(self, [options, self, datahandler])
