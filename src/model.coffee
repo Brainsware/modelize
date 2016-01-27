@@ -99,14 +99,14 @@ Modelize = (options) ->
     # Save nonexisting instance of self against API and set self.id
     #
     self.create = (callback) =>
-      self.api().create(self.export()).done (data) =>
+      self.api().create(self.export(false, true)).done (data) =>
         self.id = data.id
 
         callback()
 
     # Export all model data as an array
     #
-    self.export = (id = false) =>
+    self.export = (id = false, datahandler = false) =>
       data = {}
 
       if id == true
@@ -119,6 +119,20 @@ Modelize = (options) ->
       if options.belongs_to?
         for name, has_data of options.belongs_to
           data[name + '_id'] = self[name + '_id']()
+
+      if options.container?
+        for name, settings of options.container
+          # move to container
+          if datahandler
+            field = name.toLowerCase()
+            field = settings.field if settings.field?
+
+            datahandler = settings.datahandler if settings.datahandler?
+            datahandler = new JSONHandler()    unless settings.datahandler?
+
+            data[field] = datahandler.save self[name]()
+          else
+            data[name] = ko.toJSON self[name]()
 
       return data
 
