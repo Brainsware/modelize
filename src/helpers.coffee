@@ -73,8 +73,7 @@ create_fn = (id_param, api_name, name, model, api, options) ->
     unless @.id?
       throw new Error 'Empty ID. Save parent model first!'
 
-    if model.encrypted_container?
-      params = model.encrypt_container(params)
+    params = model(params).export(false, true)
 
     unless api?
       throw new Error 'No Connector found for resource "' + api_name + '" found: ', api
