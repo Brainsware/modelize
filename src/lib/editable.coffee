@@ -1,28 +1,27 @@
 Editable = (self, property, callback) ->
-  editing_property = 'editing_' + property
-
   Observable self, property
 
-  Observable self, editing_property, 'default'
-
-  self[property].subscribe (new_value) =>
+  self[property].extend({ editable: "" }).subscribe (new_value) =>
     r = callback new_value, property
 
   return self
 
+ko.extenders.editable = (target, options) ->
+  target.editing = ko.observable 'default'
+
 DelayedSave = (options, self, datahandler = null) ->
   (value, prop, delay = 250) =>
     if self.id?
-      if self['editing_' + prop]?
-        self['editing_' + prop] 'pending'
+      if self[prop].editing?
+        self[prop].editing 'pending'
 
       window.timeoutEditor = {} unless window.timeoutEditor?
       window.timeoutEditor[options.api + self.id] = {} unless window.timeoutEditor[options.api + self.id]?
 
       clearTimeout(window.timeoutEditor[options.api + self.id][prop])
       window.timeoutEditor[options.api + self.id][prop] = setTimeout(=>
-        if self['editing_' + prop]?
-          self['editing_' + prop] 'success'
+        if self[prop].editing?
+          self[prop].editing 'success'
 
         edit_value = {}
         edit_value[prop] = value
@@ -34,8 +33,8 @@ DelayedSave = (options, self, datahandler = null) ->
 HashedSave = (options, self) ->
   (value, prop) =>
     if self.id?
-      if self['editing_' + prop]?
-        self['editing_' + prop] 'pending'
+      if self[prop].editing?
+        self[prop].editing 'pending'
 
       if self.encryption_salt?
         value += self.encryption_salt
