@@ -26,12 +26,16 @@ ObservableArray = (self, property, initial_value) ->
 Computed = (self, property, fn) -> self[property] = ko.computed fn, self
 PureComputed = (self, property, fn) -> self[property] = ko.pureComputed fn, self
 
-MappedObservable = (self, property, container) ->
-  self[property] = ko.computed
+MappedObservable = (self, property, container, initial_value) ->
+  self[property] = ko.pureComputed
     read: ->
       container[property]()
     write: (value) ->
       container[property](value)
+    deferEvaluation: true
+
+  if initial_value?
+    self[property](initial_value)
 
 LazyObservable = (self, property, callback, params = [], init_value = null, make_array = false) ->
   unless make_array
