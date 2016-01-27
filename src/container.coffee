@@ -17,8 +17,10 @@ Container = (options = {}) ->
     Observable self, '__updated'
 
     # For external access for first_class containers
-    self.editables = []
-    self.editables = options.editable if options.editable?
+    self.editables = ->
+      editables = []
+      editables = options.editable if options.editable?
+      return editables
 
     # Include selectable functions
     if options.selectable? && options.selectable == true
