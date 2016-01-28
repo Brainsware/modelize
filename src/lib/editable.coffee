@@ -38,8 +38,8 @@ HashedSave = (options, self) ->
       if self[prop].editing?
         self[prop].editing 'pending'
 
-      if self.encryption_salt?
-        value += self.encryption_salt
+      if self.hash_salt?
+        value += self.hash_salt
       else
         console.log 'No salt for hash found. Intentional?'
 
