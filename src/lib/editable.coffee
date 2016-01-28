@@ -1,7 +1,9 @@
 Editable = (self, property, callback) ->
   Observable self, property
 
-  self[property].extend({ editable: "" }).subscribe (new_value) =>
+  self[property].extend({ editable: "" })
+
+  self[property].subscribe (new_value) =>
     r = callback new_value, property
 
   return self
