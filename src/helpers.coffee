@@ -65,10 +65,21 @@ get_fn = (id_param, api_name, name, model, api, options = {}) ->
       api[api_name].read(@.id, params).done callback
 
 create_fn = (id_param, api_name, name, model, api, options) ->
-  (params = {}, callback) =>
-    unless callback?
-      callback = (data) =>
-        @[api_name].push model(data)
+  (params = {}, callbackOrObservable) =>
+    callback = (data) =>
+      m = model(data)
+      if m.after_create?
+        m.after_create()
+      @[api_name].push m
+
+    if callbackOrObservable?
+      callback = (data) ->
+        m = model(JSON.parse(JSON.stringify(data)))
+
+        if m.after_create?
+          m.after_create()
+
+        callbackOrObservable(data)
 
     unless @.id?
       throw new Error 'Empty ID. Save parent model first!'
