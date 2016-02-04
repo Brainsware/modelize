@@ -186,7 +186,7 @@ Modelize = (options) ->
 
       callback = callbackOrObservable
 
-    model.get { id: id }, callbackOrObservable
+    model.get { id: id }, callback
 
   # Create new object with given params
   #
