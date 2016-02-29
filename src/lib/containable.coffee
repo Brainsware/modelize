@@ -26,7 +26,7 @@ Containable = (self, options) ->
 # Set default single containers
 #
 init_single_container = (self, name, datahandler, container_fn, field, first_class, options) ->
-  data = null
+  data = {}
   data = datahandler.load(self[field]) if self[field]?
 
   Observable self, name, new container_fn(data)
@@ -46,7 +46,7 @@ init_single_container = (self, name, datahandler, container_fn, field, first_cla
 # Set containers with type 'multi'
 #
 init_multi_container = (self, name, datahandler, container_fn, field, options) =>
-  data = null
+  data = {}
   data = datahandler.load(self[field]) if self[field]?
 
   # Load all items and set the subscriber to each Container
