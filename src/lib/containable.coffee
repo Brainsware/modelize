@@ -3,6 +3,7 @@ Containable = (self, options) ->
   for name, settings of options.container
     container_fn = window[name]
     container_fn = window[settings.container] if settings.container?
+    container_fn = settings.container if settings.container? and typeof settings.container == 'function'
 
     if typeof container_fn != 'function'
       throw new Error 'No container "' + name + '" found.'
@@ -63,6 +64,9 @@ init_multi_container = (self, name, datahandler, container_fn, field, options) =
 
   self[name + '_add'] = (params = {}) =>
     c = container_fn(params)
+
+    if c.after_create?
+      c.after_create()
 
     self[name].push c
     c.__updated.subscribe =>
