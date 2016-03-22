@@ -49,4 +49,4 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-browserify'
 
   grunt.registerTask 'default', ['coffee', 'uglify', 'jasmine']
-  grunt.registerTask 'test', ['jasmine']
+  grunt.registerTask 'test', ['coffee:spec', 'jasmine']
