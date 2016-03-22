@@ -11,8 +11,10 @@ Containable = (self, options) ->
     field = name.toLowerCase()
     field = settings.field if settings.field?
 
+    if typeof settings.datahandler != 'object'
+      throw new Error 'Invalid or no datahandler provided for: "' + name + '"', typeof settings.datahandler
+
     datahandler = settings.datahandler if settings.datahandler?
-    datahandler = new JSONHandler()    unless settings.datahandler?
 
     first_class = false
     first_class = settings.first_class if settings.first_class?
