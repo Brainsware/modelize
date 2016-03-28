@@ -207,13 +207,12 @@ Modelize = (options) ->
 
         callbackOrObservable(data)
 
-    if params.length > 0 || typeof params == 'object'
-      params = model(params).export(false, true)
-      connector.create(params).done callback
-    else
-      connector.create().done callback
+    m = model(params)
+    if m.before_create?
+      m.before_create()
 
-    return
+    params = m.export(false, true)
+    connector.create(params).done callback
 
   return model
 

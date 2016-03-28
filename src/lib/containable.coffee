@@ -69,6 +69,10 @@ init_multi_container = (self, name, datahandler, container_fn, field, options) =
 
     if c.after_create?
       c.after_create()
+    if c.before_create?
+      c.before_create()
+
+    params = m.export(false, true)
 
     self[name].push c
     c.__updated.subscribe =>

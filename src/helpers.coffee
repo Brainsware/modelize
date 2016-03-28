@@ -84,7 +84,11 @@ create_fn = (id_param, api_name, name, model, api, options) ->
     unless @.id?
       throw new Error 'Empty ID. Save parent model first!'
 
-    params = model(params).export(false, true)
+    m = model(params)
+    if m.before_create?
+      m.before_create()
+
+    params = m.export(false, true)
 
     unless api?
       throw new Error 'No Connector found for resource "' + api_name + '" found: ', api
