@@ -1,6 +1,5 @@
 {
   "name": "modelize",
-  "version": "3.2.2",
   "main": "dist/modelize.min.js",
   "description": "Knockout.js REST and encryptable models",
   "homepage": "http://brainsware.org",
