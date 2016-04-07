@@ -18,7 +18,7 @@
   "dependencies": {
     "knockout": ">=3.1.0",
     "sjcl": "1.*",
-    "jquery": "2.1.*",
+    "jquery": ">=2.1.0",
     "jquery.rest": "*"
   },
   "devDependencies": {
