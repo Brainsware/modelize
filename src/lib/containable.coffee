@@ -64,15 +64,17 @@ init_multi_container = (self, name, datahandler, container_fn, field, options) =
 
   ObservableArray self, name, items
 
-  self[name + '_add'] = (params = {}) =>
+  self[name + '_add'] = (params = {}, callback) =>
     c = container_fn(params)
 
     if c.after_create?
       c.after_create()
     if c.before_create?
       c.before_create()
+    if callback?
+      callback(c)
 
-    params = m.export(false, true)
+    params = c.export(false, true)
 
     self[name].push c
     c.__updated.subscribe =>
