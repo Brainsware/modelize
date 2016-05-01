@@ -5,6 +5,7 @@
   "license": "MIT",
   "description": "REST model interface for KnockoutJS",
   "homepage": "http://brainsware.org",
+  "main": "src/model.coffee",
   "repository": {
     "type": "git",
     "url": "https://github.com/Brainsware/modelize"
