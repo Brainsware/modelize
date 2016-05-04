@@ -1,3 +1,20 @@
+if typeof require == 'function'
+  ko = require('knockout')
+
+  object_merge = require('./lib/utils')
+
+  Observables  = require './lib/observable'
+  Observable   = Observables.Observable
+  Computed     = Observables.Computed
+  PureComputed = Observables.PureComputed
+
+  Relatable   = require './lib/relatable'
+  Containable = require './lib/containable'
+
+  Editable    = require './lib/editable'
+  DelayedSave = require './lib/delayedsave'
+  HashedSave  = require './lib/hashedsave'
+
 # The modelize main function
 # Returns a modelize object
 #

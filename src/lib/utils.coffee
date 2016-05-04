@@ -10,3 +10,5 @@ object_merge = (a, b) ->
     result[key] = b[key] unless a[key]?
 
   result
+
+module.exports = object_merge if module?

@@ -1,5 +1,5 @@
-#if require?
-#  ko = require '../../../knockout/build/output/knockout-latest.debug'
+if typeof require == 'function'
+  ko = require('knockout')
 
 Observable = (self, property, initial_value) ->
   initial_value = self[property] if initial_value == undefined
@@ -73,5 +73,5 @@ if module?
     Observable:      Observable
     ObservableArray: ObservableArray
     Computed:        Computed
-    ComputedArray:   ComputedArray
+    PureComputed:    PureComputed
     LazyObservable:  LazyObservable

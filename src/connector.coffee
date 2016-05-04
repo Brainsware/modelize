@@ -1,3 +1,10 @@
+if typeof require == 'function'
+  object_merge = require('./lib/utils')
+
+  $ = require('jquery')
+  window.jQuery = require('jquery')
+  require('../vendor/jquery.rest/dist/1/jquery.rest.min.js')
+
 class RESTConnector
   constructor: (base = '/api/', settings = {}) ->
     default_settings =
@@ -17,4 +24,4 @@ class RESTConnector
     for name, data of sub_resources
       @connector[resource].add name + 's' unless @connector[resource][name + 's']
 
-module.exports = Connector if module?
+module.exports = RESTConnector if module?

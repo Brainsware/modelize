@@ -84,3 +84,5 @@ init_multi_container = (self, name, datahandler, container_fn, field, options) =
   self[name].subscribe =>
     callback = DelayedSave.apply(self, [options, self, datahandler])
     callback self[name](), field
+
+module.exports = Containable if module?

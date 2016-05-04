@@ -1,3 +1,6 @@
+if typeof require == 'function'
+  ko = require('knockout')
+
 Selectable = (self) ->
   self.selected = ko.observable false
 
