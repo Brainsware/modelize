@@ -1,3 +1,11 @@
+if typeof require == 'function'
+  object_merge = require './utils'
+  Helpers      = require '../helpers'
+
+  Observables     = require './observable'
+  Observable      = Observables.Observable
+  ObservableArray = Observables.ObservableArray
+
 Relatable = (self, options) ->
   # Set relations
   # API wise has_one and belongs_to are the same, so we merge them
@@ -23,11 +31,13 @@ Relatable = (self, options) ->
       object_merge data,
         model: name.capitalize()
 
-      relation_params = relationship_fields name, data.model, self.api(), options
+      relation_params = Helpers.relationship_fields name, data.model, self.api(), options
 
       fn = window[data.model]
+      fn = data.model if data.model? and typeof data.model == 'function'
 
       if typeof fn != 'function'
+        console.debug 'Relation model for "' + name + '" not a function: ', fn
         throw new Error 'No model for has_one/belongs_to relation found'
 
       if typeof self[name + '_id'] != 'function' && name not in options.belongs_to
@@ -43,7 +53,7 @@ Relatable = (self, options) ->
         Observable self, name, new fn()
         #LazyObservable self, name, lazy_single_get_fn, relation_params
 
-      self[name + '_get'] = single_get_fn.apply self, relation_params
+      self[name + '_get'] = Helpers.single_get_fn.apply self, relation_params
 
   # Multiple relations
   # Generated methods:
@@ -66,7 +76,7 @@ Relatable = (self, options) ->
       object_merge data,
         model: name.capitalize()
 
-      relation_params = relationship_fields name, data.model, self.api(), options
+      relation_params = Helpers.relationship_fields name, data.model, self.api(), options
 
       # Get
       #
@@ -81,12 +91,14 @@ Relatable = (self, options) ->
       else
         ObservableArray self, name + 's', []
         #LazyObservableArray self, name + 's', lazy_get_fn, relation_params
-      self[name + '_get'] = get_fn.apply self, relation_params
+      self[name + '_get'] = Helpers.get_fn.apply self, relation_params
 
       # Create
       #
-      self[name + '_add'] = create_fn.apply self, relation_params
+      self[name + '_add'] = Helpers.create_fn.apply self, relation_params
 
       # Destroy
       #
-      self[name + '_destroy'] = destroy_fn.apply self, relation_params
+      self[name + '_destroy'] = Helpers.destroy_fn.apply self, relation_params
+
+module.exports = Relatable if module?
