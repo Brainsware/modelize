@@ -111,6 +111,9 @@ Modelize = (options) ->
       unless self.id?
         throw new Error 'Trying to delete nonexisting model object'
 
+      if self.onDestroy?
+        self.onDestroy()
+
       self.api().destroy(self.id).done callback
 
     # Save nonexisting instance of self against API and set self.id
