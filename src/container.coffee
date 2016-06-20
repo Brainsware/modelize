@@ -1,3 +1,17 @@
+if typeof require == 'function'
+  ko = require('knockout')
+
+  Observables      = require './lib/observable'
+  Observable       = Observables.Observable
+  ObservableArray  = Observables.ObservableArray
+  MappedObservable = Observables.MappedObservable
+  Computed     = Observables.Computed
+  PureComputed = Observables.PureComputed
+
+  Editable    = require './lib/editable'
+  DelayedSave = require './lib/delayedsave'
+  HashedSave  = require './lib/hashedsave'
+
 # The container main function
 # Returns a container object
 # A container is a minimal subset of the modelize functionality

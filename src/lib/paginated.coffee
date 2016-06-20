@@ -15,10 +15,10 @@
 #   * page     - optional    - page (1 based) to load initially, default 0
 #   * per_page - optional    - how many items to load per page, default 20
 
-if require?
-  Observables = require '../lib/observable'
-  Observable  = Observables.Observable
-  Computed    = Observables.Computed
+#if typeof require == 'function'
+#  Observables = require './observable'
+#  Observable  = Observables.Observable
+#  Computed    = Observables.Computed
 
 Paginated = (self, options) ->
   throw new Error 'Error: no object or options given' unless self? && options?

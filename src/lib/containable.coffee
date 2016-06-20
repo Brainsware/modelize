@@ -1,3 +1,11 @@
+if typeof require == 'function'
+  ko = require('knockout')
+
+  Observables      = require './observable'
+  Observable       = Observables.Observable
+  ObservableArray  = Observables.ObservableArray
+  MappedObservable = Observables.MappedObservable
+
 Containable = (self, options) ->
   # Initialize all containers
   for name, settings of options.container

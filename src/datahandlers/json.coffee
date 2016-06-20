@@ -4,3 +4,5 @@ class JSONHandler
 
   save: (data) ->
     JSON.stringify data
+
+module.exports = JSONHandler if module?
