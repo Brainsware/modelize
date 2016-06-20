@@ -1,7 +1,7 @@
 describe('RelationshipFn', function() {
   return it('returns an object', function() {
     var obj;
-    obj = relationship_fields('test');
+    obj = Helpers.relationship_fields('test');
     return expect(typeof obj).toBe('object');
   });
 });
@@ -11,8 +11,8 @@ describe('GetHelper', function() {
     var connector, fields;
     connector = new RESTConnector('/');
     connector.init('tests');
-    fields = relationship_fields('test', null, connector);
-    this.multi_get = get_fn.apply(self, fields);
+    fields = Helpers.relationship_fields('test', null, connector);
+    this.multi_get = Helpers.get_fn.apply(self, fields);
     this.callback = {
       fn: function() {
         return true;

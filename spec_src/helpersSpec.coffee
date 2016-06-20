@@ -1,6 +1,6 @@
 describe 'RelationshipFn', ->
   it 'returns an object', ->
-    obj = relationship_fields('test')
+    obj = Helpers.relationship_fields('test')
 
     expect(typeof obj).toBe 'object'
 
@@ -9,9 +9,9 @@ describe 'GetHelper', ->
     connector = new RESTConnector('/')
     connector.init 'tests'
 
-    fields = relationship_fields('test', null, connector)
+    fields = Helpers.relationship_fields('test', null, connector)
 
-    @multi_get = get_fn.apply self, fields
+    @multi_get = Helpers.get_fn.apply self, fields
 
     @callback =
       fn: -> return true
