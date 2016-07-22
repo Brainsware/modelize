@@ -9,6 +9,10 @@ module.exports = (grunt) ->
       build:
         src: 'dist/modelize/**/*.js'
         dest: 'dist/modelize.min.js'
+    concat:
+      dist:
+        src: 'dist/modelize/**/*.js'
+        dest: 'dist/modelize.js'
     coffee:
       main:
         options:
@@ -28,7 +32,7 @@ module.exports = (grunt) ->
         dest: 'spec/'
         ext: '.js'
     jasmine:
-      src: [ 'dist/modelize.min.js' ]
+      src: [ 'dist/modelize.js' ]
       options:
         specs: [ 'spec/*.js' ]
         vendor: [
@@ -38,15 +42,12 @@ module.exports = (grunt) ->
           'vendor/knockout/dist/knockout.js',
           'vendor/sjcl/sjcl.js'
           ]
-    watch:
-      files: ['<%= coffee.main.src %>', '<%= coffee.spec.src %>']
-      tasks: ['coffee', 'uglify', 'jasmine']
 
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-jasmine'
-  grunt.loadNpmTasks 'grunt-contrib-watch'
+  grunt.loadNpmTasks 'grunt-contrib-concat'
   grunt.loadNpmTasks 'grunt-browserify'
 
-  grunt.registerTask 'default', ['coffee', 'uglify', 'jasmine']
+  grunt.registerTask 'default', ['coffee', 'uglify', 'concat', 'jasmine']
   grunt.registerTask 'test', ['coffee:spec', 'jasmine']
