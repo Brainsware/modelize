@@ -30,6 +30,17 @@ Container = (options = {}) ->
     # Stores updated information for external retrieval and subscription
     Observable self, '__updated'
 
+    # Export all model data as an array
+    #
+    self.export = () =>
+      data = {}
+
+      if options.editable?
+        for index, name of options.editable
+          data[name] = self[name]()
+
+      return data
+
     # For external access for first_class containers
     self.editables = ->
       editables = []
@@ -67,16 +78,14 @@ Container = (options = {}) ->
       for name, fn of options.functions
         self[name] = fn
 
-    # Export all model data as an array
+    # Add user defined subscriptions
     #
-    self.export = () =>
-      data = {}
+    if options.subscriptions?
+      for name, fn of options.subscriptions
+        unless ko.isObservable(self[name])
+          throw new Error 'No observable to subscribe to found: ' + name
 
-      if options.editable?
-        for index, name of options.editable
-          data[name] = self[name]()
-
-      return data
+        self[name].subscribe fn
 
     return self
 

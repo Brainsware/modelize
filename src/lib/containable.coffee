@@ -79,6 +79,7 @@ init_multi_container = (self, name, datahandler, container_fn, field, options) =
       c.after_create()
     if c.before_create?
       c.before_create()
+
     if callback?
       callback(c)
 
