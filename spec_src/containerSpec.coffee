@@ -32,9 +32,22 @@ describe 'Container', ->
   it 'has single container', ->
     expect(typeof @post.PostData).toBe 'function'
 
+  it 'has first class objects from container', ->
+    expect(typeof @post.title).toBe 'function'
+    expect(typeof @post.content).toBe 'function'
+
+    @post.title 'Post Title'
+    @post.content 'Post Content'
+
   it 'can add comments', ->
     expect(typeof @post.comments_add).toBe 'function'
 
     @post.comments_add
       title:  'Test Title'
-      conent: 'Test Content'
+      content: 'Test Content'
+
+  it 'exports containers', ->
+    data = @post.export()
+
+    expect(data).toEqual jasmine.objectContaining({ PostData: { title: 'Post Title', content: 'Post Content' } })
+    expect(data).toEqual jasmine.objectContaining({ comments: [ {title: 'Test Title', content: 'Test Content'} ] })
