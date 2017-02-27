@@ -147,12 +147,16 @@ Modelize = (options) ->
             field = name.toLowerCase()
             field = settings.field if settings.field?
 
-            datahandler = settings.datahandler if settings.datahandler?
+            datahandler = settings.datahandler if     settings.datahandler?
             datahandler = new JSONHandler()    unless settings.datahandler?
 
             data[field] = datahandler.save self[name]()
           else
-            data[name] = ko.toJSON self[name]()
+            unless Array.isArray self[name]()
+              data[name] = self[name]().export()
+            else
+              data[name] = []
+              data[name][index] = x.export() for x, index in self[name]()
 
       return data
 
@@ -188,11 +192,9 @@ Modelize = (options) ->
           params[param] = getHash(params[param] + salt)
 
     if params? && params.id?
-      connector.read(params.id, params).done callback
+      return connector.read(params.id, params).done callback
     else
-      connector.read(params).done callback
-
-    return
+      return connector.read(params).done callback
 
   # Shorthand for model.get, just provide a single ID
   #
