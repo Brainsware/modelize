@@ -5,4 +5,4 @@ class HashHandler
     @salt = settings.salt
 
   save: (data) =>
-    getHash(data + @salt)
+    SJCLUtils.getHash(data + @salt)

@@ -10,7 +10,7 @@ HashedSave = (options, self) ->
         console.log 'No salt for hash found. Intentional?'
 
       edit_value = {}
-      edit_value[prop] = getHash(value)
+      edit_value[prop] = SJCLUtils.getHash(value)
       res = self.update edit_value
 
       if self.on_save_success?

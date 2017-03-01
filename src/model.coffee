@@ -15,6 +15,8 @@ if typeof require == 'function'
   DelayedSave = require './lib/delayedsave'
   HashedSave  = require './lib/hashedsave'
 
+  SJCLUtils   = require './lib/sjcl'
+
 # The modelize main function
 # Returns a modelize object
 #
@@ -189,7 +191,7 @@ Modelize = (options) ->
 
       for param of params
         if param in options.hashed_index
-          params[param] = getHash(params[param] + salt)
+          params[param] = SJCLUtils.getHash(params[param] + salt)
 
     if params? && params.id?
       return connector.read(params.id, params).done callback
