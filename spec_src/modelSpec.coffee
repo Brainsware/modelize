@@ -17,7 +17,9 @@ Post = Modelize
   has_many:
     comment:
       model: 'Comment'
-  editable: [ 'fieldOne', 'fieldTwo' ]
+  editable: [ 'title', 'content' ]
+  hash_salt: 'generated_salt_1234'
+  hashed_index: [ 'year' ]
 
 # Single Submodel
 Author = Modelize
@@ -55,16 +57,23 @@ describe 'Public Model API', ->
     request.respondWith Responses.general
 
   it 'gets and puts into an observable', ->
-    ObservableArray @, 'test'
-    spyOn @test, 'push'
+    ObservableArray @, 'posts'
+    spyOn @posts, 'push'
 
-    Post.get {}, @test
+    Post.get {}, @posts
 
     request = jasmine.Ajax.requests.mostRecent()
     request.respondWith Responses.generalMulti
 
-    expect(@test.push).toHaveBeenCalled()
-    expect(@test.push).toHaveBeenCalledWith jasmine.objectContaining({ id: 1 })
+    expect(@posts.push).toHaveBeenCalled()
+    expect(@posts.push).toHaveBeenCalledWith jasmine.objectContaining({ id: 1 })
+
+  it 'gets with hashed indexes', ->
+    Post.get { year: 2016 }, (data) ->
+
+    request = jasmine.Ajax.requests.mostRecent()
+
+    expect(request.url).toBe '/posts?year=6298c87611a8f30f101413c74275e426623681c63cf7a5c415543ad496ee5c40'
 
   it 'creates and calls a function', ->
     Post.create {}, (data) ->

@@ -26,7 +26,9 @@ Post = Modelize({
       model: 'Comment'
     }
   },
-  editable: ['fieldOne', 'fieldTwo']
+  editable: ['title', 'content'],
+  hash_salt: 'generated_salt_1234',
+  hashed_index: ['year']
 });
 
 Author = Modelize({
@@ -66,15 +68,23 @@ describe('Public Model API', function() {
   });
   it('gets and puts into an observable', function() {
     var request;
-    ObservableArray(this, 'test');
-    spyOn(this.test, 'push');
-    Post.get({}, this.test);
+    ObservableArray(this, 'posts');
+    spyOn(this.posts, 'push');
+    Post.get({}, this.posts);
     request = jasmine.Ajax.requests.mostRecent();
     request.respondWith(Responses.generalMulti);
-    expect(this.test.push).toHaveBeenCalled();
-    return expect(this.test.push).toHaveBeenCalledWith(jasmine.objectContaining({
+    expect(this.posts.push).toHaveBeenCalled();
+    return expect(this.posts.push).toHaveBeenCalledWith(jasmine.objectContaining({
       id: 1
     }));
+  });
+  it('gets with hashed indexes', function() {
+    var request;
+    Post.get({
+      year: 2016
+    }, function(data) {});
+    request = jasmine.Ajax.requests.mostRecent();
+    return expect(request.url).toBe('/posts?year=6298c87611a8f30f101413c74275e426623681c63cf7a5c415543ad496ee5c40');
   });
   it('creates and calls a function', function() {
     var request;
