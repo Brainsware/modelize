@@ -227,7 +227,7 @@ HashHandler = (function() {
   }
 
   HashHandler.prototype.save = function(data) {
-    return getHash(data + this.salt);
+    return SJCLUtils.getHash(data + this.salt);
   };
 
   return HashHandler;
@@ -665,7 +665,7 @@ HashedSave = function(options, self) {
           console.log('No salt for hash found. Intentional?');
         }
         edit_value = {};
-        edit_value[prop] = getHash(value);
+        edit_value[prop] = SJCLUtils.getHash(value);
         res = self.update(edit_value);
         if (self.on_save_success != null) {
           res.done(self.on_save_success);
@@ -1135,7 +1135,7 @@ if (typeof module !== "undefined" && module !== null) {
 
 //# sourceMappingURL=utils.js.map
 
-var Computed, Containable, DelayedSave, Editable, HashedSave, Modelize, Observable, Observables, PureComputed, Relatable, ko, object_merge,
+var Computed, Containable, DelayedSave, Editable, HashedSave, Modelize, Observable, Observables, PureComputed, Relatable, SJCLUtils, ko, object_merge,
   indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 if (typeof require === 'function') {
@@ -1150,6 +1150,7 @@ if (typeof require === 'function') {
   Editable = require('./lib/editable');
   DelayedSave = require('./lib/delayedsave');
   HashedSave = require('./lib/hashedsave');
+  SJCLUtils = require('./lib/sjcl');
 }
 
 Modelize = function(options) {
@@ -1355,7 +1356,7 @@ Modelize = function(options) {
       }
       for (param in params) {
         if (indexOf.call(options.hashed_index, param) >= 0) {
-          params[param] = getHash(params[param] + salt);
+          params[param] = SJCLUtils.getHash(params[param] + salt);
         }
       }
     }
