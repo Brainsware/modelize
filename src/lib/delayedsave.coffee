@@ -1,5 +1,5 @@
 DelayedSave = (options, self, datahandler = null) ->
-  (value, prop, delay = 350) =>
+  (value, prop, delay = 500) =>
     if self.id?
       if self[prop] && self[prop].editing?
         self[prop].editing 'pending'
