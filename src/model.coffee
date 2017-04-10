@@ -124,7 +124,7 @@ Modelize = (options) ->
       self.api().create(self.export(false, true)).done (data) =>
         self.id = data.id
 
-        callback()
+        callback() if callback?
 
     # Export all model data as an array
     #
