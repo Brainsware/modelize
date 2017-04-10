@@ -242,11 +242,11 @@ JSONHandler = (function() {
   function JSONHandler() {}
 
   JSONHandler.prototype.load = function(data) {
-    return JSON.parse(data);
+    return JSON.parse(atob(data));
   };
 
   JSONHandler.prototype.save = function(data) {
-    return JSON.stringify(data);
+    return btoa(ko.toJSON(data));
   };
 
   return JSONHandler;
@@ -526,7 +526,9 @@ init_multi_container = (function(_this) {
         c.__updated.subscribe(function() {
           var callback;
           callback = DelayedSave.apply(self, [options, self, datahandler]);
-          return callback(self[name](), field);
+          return callback(self[name]().map(function(e) {
+            return e["export"]();
+          }), field);
         });
       }
     }
@@ -549,13 +551,17 @@ init_multi_container = (function(_this) {
       self[name].push(c);
       return c.__updated.subscribe(function() {
         callback = DelayedSave.apply(self, [options, self, datahandler]);
-        return callback(self[name](), field);
+        return callback(self[name]().map(function(e) {
+          return e["export"]();
+        }), field);
       });
     };
     return self[name].subscribe(function() {
       var callback;
       callback = DelayedSave.apply(self, [options, self, datahandler]);
-      return callback(self[name](), field);
+      return callback(self[name]().map(function(e) {
+        return e["export"]();
+      }), field);
     });
   };
 })(this);
@@ -575,38 +581,42 @@ DelayedSave = function(options, self, datahandler) {
   return (function(_this) {
     return function(value, prop, delay) {
       if (delay == null) {
-        delay = 350;
+        delay = 500;
       }
-      if (self.id != null) {
+      if (self.id == null) {
+        return;
+      }
+      if (options.save_delay != null) {
+        delay = options.save_delay;
+      }
+      if (self[prop] && (self[prop].editing != null)) {
+        self[prop].editing('pending');
+      }
+      if (window.timeoutEditor == null) {
+        window.timeoutEditor = {};
+      }
+      if (window.timeoutEditor[options.api + self.id] == null) {
+        window.timeoutEditor[options.api + self.id] = {};
+      }
+      clearTimeout(window.timeoutEditor[options.api + self.id][prop]);
+      return window.timeoutEditor[options.api + self.id][prop] = setTimeout(function() {
+        var edit_value, res;
         if (self[prop] && (self[prop].editing != null)) {
-          self[prop].editing('pending');
+          self[prop].editing('success');
         }
-        if (window.timeoutEditor == null) {
-          window.timeoutEditor = {};
+        edit_value = {};
+        edit_value[prop] = value;
+        if (datahandler != null) {
+          edit_value[prop] = datahandler.save(value);
         }
-        if (window.timeoutEditor[options.api + self.id] == null) {
-          window.timeoutEditor[options.api + self.id] = {};
+        res = self.update(edit_value);
+        if (self.on_save_success != null) {
+          res.done(self.on_save_success);
         }
-        clearTimeout(window.timeoutEditor[options.api + self.id][prop]);
-        return window.timeoutEditor[options.api + self.id][prop] = setTimeout(function() {
-          var edit_value, res;
-          if (self[prop] && (self[prop].editing != null)) {
-            self[prop].editing('success');
-          }
-          edit_value = {};
-          edit_value[prop] = value;
-          if (datahandler != null) {
-            edit_value[prop] = datahandler.save(value);
-          }
-          res = self.update(edit_value);
-          if (self.on_save_success != null) {
-            res.done(self.on_save_success);
-          }
-          if (self.on_save_fail != null) {
-            return res.fail(self.on_save_fail);
-          }
-        }, delay);
-      }
+        if (self.on_save_fail != null) {
+          return res.fail(self.on_save_fail);
+        }
+      }, delay);
     };
   })(this);
 };
@@ -1256,13 +1266,15 @@ Modelize = function(options) {
       return function(callback) {
         return self.api().create(self["export"](false, true)).done(function(data) {
           self.id = data.id;
-          return callback();
+          if (callback != null) {
+            return callback();
+          }
         });
       };
     })(this);
     self["export"] = (function(_this) {
       return function(id, datahandler) {
-        var data, field, has_data, i, len, ref6, ref7, ref8, ref9, settings, x;
+        var data, field, has_data, ref6, ref7, ref8, settings;
         if (id == null) {
           id = false;
         }
@@ -1291,6 +1303,14 @@ Modelize = function(options) {
           ref8 = options.container;
           for (name in ref8) {
             settings = ref8[name];
+            if (!Array.isArray(self[name]())) {
+              data[name] = self[name]()["export"]();
+            } else {
+              data[name] = [];
+              data[name] = self[name]().map(function(e) {
+                return e["export"]();
+              });
+            }
             if (datahandler) {
               field = name.toLowerCase();
               if (settings.field != null) {
@@ -1302,17 +1322,9 @@ Modelize = function(options) {
               if (settings.datahandler == null) {
                 datahandler = new JSONHandler();
               }
-              data[field] = datahandler.save(self[name]());
-            } else {
-              if (!Array.isArray(self[name]())) {
-                data[name] = self[name]()["export"]();
-              } else {
-                data[name] = [];
-                ref9 = self[name]();
-                for (index = i = 0, len = ref9.length; i < len; index = ++i) {
-                  x = ref9[index];
-                  data[name][index] = x["export"]();
-                }
+              data[field] = datahandler.save(data[name]);
+              if (name !== field) {
+                delete data[name];
               }
             }
           }

@@ -47,6 +47,9 @@ Comment = Modelize({
 });
 
 describe('Public Model API', function() {
+  afterAll(function() {
+    return jasmine.Ajax.uninstall();
+  });
   beforeAll(function() {
     jasmine.Ajax.install();
     return this.instance = new Post();
