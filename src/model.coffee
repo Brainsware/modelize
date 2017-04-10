@@ -145,6 +145,12 @@ Modelize = (options) ->
       if options.container?
         for name, settings of options.container
           # move to container
+          unless Array.isArray self[name]()
+            data[name] = self[name]().export()
+          else
+            data[name] = []
+            data[name] = self[name]().map (e) -> e.export()
+
           if datahandler
             field = name.toLowerCase()
             field = settings.field if settings.field?
@@ -152,13 +158,8 @@ Modelize = (options) ->
             datahandler = settings.datahandler if     settings.datahandler?
             datahandler = new JSONHandler()    unless settings.datahandler?
 
-            data[field] = datahandler.save self[name]()
-          else
-            unless Array.isArray self[name]()
-              data[name] = self[name]().export()
-            else
-              data[name] = []
-              data[name][index] = x.export() for x, index in self[name]()
+            data[field] = datahandler.save data[name]
+            delete data[name] if name != field
 
       return data
 
