@@ -68,7 +68,7 @@ init_multi_container = (self, name, datahandler, container_fn, field, options) =
       items.push c
       c.__updated.subscribe =>
         callback = DelayedSave.apply(self, [options, self, datahandler])
-        callback self[name](), field
+        callback self[name]().map((e) -> e.export()), field
 
   ObservableArray self, name, items
 
@@ -88,10 +88,10 @@ init_multi_container = (self, name, datahandler, container_fn, field, options) =
     self[name].push c
     c.__updated.subscribe =>
       callback = DelayedSave.apply(self, [options, self, datahandler])
-      callback self[name](), field
+      callback self[name]().map((e) -> e.export()), field
 
   self[name].subscribe =>
     callback = DelayedSave.apply(self, [options, self, datahandler])
-    callback self[name](), field
+    callback self[name]().map((e) -> e.export()), field
 
 module.exports = Containable if module?
