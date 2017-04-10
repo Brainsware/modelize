@@ -35,6 +35,9 @@ Comment = Modelize
       model: 'Post'
 
 describe 'Public Model API', ->
+  afterAll ->
+    jasmine.Ajax.uninstall()
+    
   beforeAll ->
     jasmine.Ajax.install()
 
