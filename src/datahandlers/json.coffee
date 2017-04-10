@@ -1,8 +1,8 @@
 class JSONHandler
   load: (data) ->
-    JSON.parse data
+    JSON.parse atob data
 
   save: (data) ->
-    JSON.stringify data
+    btoa ko.toJSON data
 
 module.exports = JSONHandler if module?
