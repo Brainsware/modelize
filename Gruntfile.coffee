@@ -36,7 +36,7 @@ module.exports = (grunt) ->
       options:
         specs: [ 'spec/*.js' ]
         vendor: [
-          'vendor/jasmine-ajax/lib/mock-ajax.js',
+          'node_modules/jasmine-ajax/lib/mock-ajax.js',
           'vendor/jquery/dist/jquery.min.js',
           'vendor/jquery.rest/dist/1/jquery.rest.min.js',
           'vendor/knockout/dist/knockout.js',

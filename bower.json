@@ -21,10 +21,6 @@
     "jquery": ">=2.1.0",
     "jquery.rest": "*"
   },
-  "devDependencies": {
-    "jasmine-core": "2.*",
-    "jasmine-ajax": "3.*"
-  },
   "ignore": [
     "**/.*",
     "node_modules",
