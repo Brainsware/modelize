@@ -1,10 +1,10 @@
 {
-  "name": "modelize",
+  "name": "ko-modelize",
   "title": "modelize",
-  "version": "3.2.2",
+  "version": "3.5.0",
   "license": "MIT",
   "description": "REST model interface for KnockoutJS",
-  "homepage": "http://brainsware.org",
+  "homepage": "https://brainsware.at",
   "main": "src/model.coffee",
   "repository": {
     "type": "git",
@@ -27,5 +27,8 @@
   },
   "scripts": {
     "test": "grunt test"
-  }
+  },
+  "keywords": [
+    "knockout", "knockoutjs"
+  ]
 }
