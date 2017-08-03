@@ -3,6 +3,8 @@
 
 # Modelize
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/Brainsware/modelize.svg)](https://greenkeeper.io/)
+
 Modelize is a small model/data interface for REST APIs using KnockoutJS. It also integrates encryption functionality in combination with SJCL.
 
 
