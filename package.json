@@ -16,7 +16,7 @@
     "url": "http://brainsware.org"
   },
   "devDependencies": {
-    "grunt": "~1.0.1",
+    "grunt": "1.0.3",
     "grunt-browserify": "*",
     "grunt-cli": "~1.2.0",
     "grunt-contrib-coffee": "*",
