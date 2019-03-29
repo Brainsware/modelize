@@ -23,7 +23,7 @@
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-jasmine": "*",
     "grunt-contrib-uglify": "^3.0.1",
-    "jasmine-ajax": "3.*"
+    "jasmine-ajax": "^4.0.0"
   },
   "scripts": {
     "test": "grunt test"
